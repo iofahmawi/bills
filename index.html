@@ -315,7 +315,6 @@
                 <div class="extra-inputs">
                     <div style="flex:1;">
                         <label>تاريخ الفاتورة السابقة</label>
-                        <!-- استخدام inputmode numeric لاظهار لوحة الأرقام مع الاحتفاظ بالنص للشرط -->
                         <input type="text" id="reading-day" placeholder="" inputmode="numeric" pattern="\d*" class="enter-to-next" autocomplete="off" spellcheck="false">
                     </div>
                     <div class="waste-input-wrapper">
@@ -546,17 +545,18 @@
                     const y = parseInt(dateParts[0], 10);
                     const m = parseInt(dateParts[1], 10) - 1;
                     const d = parseInt(dateParts[2], 10);
-                    const startDate = new Date(y, m, d);
+                    const timeVal = '09:00';
+                    const [rh, rm] = timeVal.split(':').map(Number);
+                    const startDate = new Date(y, m, d, rh, rm, 0, 0);
                     const now = new Date();
-                    startDate.setHours(0,0,0,0); now.setHours(0,0,0,0);
-                    const diffTime = now - startDate;
-                    let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                    if (diffDays <= 0) diffDays = 1;
+                    const diffMs = now - startDate;
+                    const diffHours = diffMs / (1000 * 60 * 60);
+                    const diffDays = diffHours > 0 ? diffHours / 24 : 1;
                     const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
                     const dailyAvg = formatNumber(dailyAvgRaw);
 
-                    let dayLabel = (diffDays === 1) ? "يوم واحد" : (diffDays === 2) ? "يومين" : (diffDays >= 3 && diffDays <= 10) ? `<strong>${diffDays}</strong> أيام` : `<strong>${diffDays}</strong> يوم`;
-                    let predictionHtml = "";
+                    let dayLabel = (diffDays === 1) ? "يوم واحد" : (diffDays === 2) ? "يومين" : (diffDays >= 3 && diffDays <= 10) ? `<strong>${Math.round(diffDays)}</strong> أيام` : `<strong>${Math.round(diffDays)}</strong> يوم`;
+
                     let trafficClass = "avg-warning"; 
 
                     const endDateOfCycle = new Date(y, m + 1, d);
