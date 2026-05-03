@@ -315,6 +315,7 @@
                 <div class="extra-inputs">
                     <div style="flex:1;">
                         <label>تاريخ الفاتورة السابقة</label>
+                        <!-- استخدام inputmode numeric لاظهار لوحة الأرقام مع الاحتفاظ بالنص للشرط -->
                         <input type="text" id="reading-day" placeholder="" inputmode="numeric" pattern="\d*" class="enter-to-next" autocomplete="off" spellcheck="false">
                     </div>
                     <div class="waste-input-wrapper">
@@ -329,11 +330,11 @@
                 <div class="radio-options">
                     <div class="radio-option">
                         <input type="radio" id="phase-1" name="meter-phase" value="1" checked>
-                        <label for="phase-1">1 فاز</label>
+                        <label for="phase-1"><span style="transform:translateY(1px);display:inline-block">1 فاز</span></label>
                     </div>
                     <div class="radio-option">
                         <input type="radio" id="phase-3" name="meter-phase" value="3">
-                        <label for="phase-3">3 فاز</label>
+                        <label for="phase-3"><span style="transform:translateY(1px);display:inline-block">3 فاز</span></label>
                     </div>
                 </div>
             </div>
@@ -545,18 +546,17 @@
                     const y = parseInt(dateParts[0], 10);
                     const m = parseInt(dateParts[1], 10) - 1;
                     const d = parseInt(dateParts[2], 10);
-                    const timeVal = '09:00';
-                    const [rh, rm] = timeVal.split(':').map(Number);
-                    const startDate = new Date(y, m, d, rh, rm, 0, 0);
+                    const startDate = new Date(y, m, d, 9, 0, 0, 0);
                     const now = new Date();
                     const diffMs = now - startDate;
                     const diffHours = diffMs / (1000 * 60 * 60);
-                    const diffDays = diffHours > 0 ? diffHours / 24 : 1;
+                    let diffDays = diffHours > 0 ? diffHours / 24 : 1;
                     const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
                     const dailyAvg = formatNumber(dailyAvgRaw);
 
-                    let dayLabel = (diffDays === 1) ? "يوم واحد" : (diffDays === 2) ? "يومين" : (diffDays >= 3 && diffDays <= 10) ? `<strong>${Math.round(diffDays)}</strong> أيام` : `<strong>${Math.round(diffDays)}</strong> يوم`;
-
+                    const roundedDays = Math.round(diffDays);
+                    let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
+                    let predictionHtml = "";
                     let trafficClass = "avg-warning"; 
 
                     const endDateOfCycle = new Date(y, m + 1, d);
