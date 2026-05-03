@@ -554,7 +554,7 @@
                     const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
                     const dailyAvg = formatNumber(dailyAvgRaw);
 
-                    const roundedDays = Math.round(diffDays);
+                    const roundedDays = Math.floor(diffDays);
                     let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
                     let predictionHtml = "";
                     let trafficClass = "avg-warning"; 
