@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>حاسبة الفواتير</title>
+    <title>حاسبة الكهرباء الشهرية</title>
     <meta name="theme-color" content="#2563eb">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-1024.png">
@@ -11,23 +11,24 @@
 
     <style>
         :root {
-            --primary: #2563eb;
+            --primary: #2563eb; 
             --primary-light: #dbeafe;
-            --secondary-green: #10b981;
+            --secondary-green: #10b981; 
             --white: #ffffff;
             --bg-light: #f8fafc;
             --text-main: #1e293b;
             --text-muted: #64748b;
             --error-red: #ef4444;
             --radius: 16px;
-            --shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
             --standard-height: 42px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0; padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        * { 
+            box-sizing: border-box; 
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             -webkit-tap-highlight-color: transparent;
             outline: none;
         }
@@ -44,11 +45,10 @@
 
         .content-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
 
-        /* ===== Header ===== */
         .header-blue {
             background-color: var(--primary);
             color: var(--white);
-            padding: 25px 20px 80px;
+            padding: 25px 20px 80px; 
             text-align: center;
             border-bottom-left-radius: 40px;
             border-bottom-right-radius: 40px;
@@ -61,19 +61,9 @@
             }
         }
 
-        .header-blue h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            cursor: pointer;
-            display: inline-block;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
+        .header-blue h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 10px; }
         .header-blue p { font-size: 1rem; opacity: 0.9; }
 
-        /* ===== Card ===== */
         .card {
             background-color: var(--white);
             border-radius: var(--radius);
@@ -102,24 +92,27 @@
         .input-group input {
             width: 100%;
             height: var(--standard-height);
-            padding: 6px 10px;
+            padding: 6px 10px; 
             border: 1.5px solid #e2e8f0;
             border-radius: 10px;
             font-size: 1.05rem;
             font-weight: 600;
-            text-align: center;
+            text-align: center; 
             transition: all 0.2s ease;
             background: #fdfdfd;
         }
 
         .input-group input:focus {
-            border-color: var(--primary);
+            border-color: var(--primary); 
             background: var(--white);
         }
 
-        #e-reading-day { direction: rtl; text-align: center; }
+        /* تنسيق حقل التاريخ: اتجاه RTL */
+        #reading-day {
+            direction: rtl;
+            text-align: center;
+        }
 
-        /* ===== Radio ===== */
         .radio-group { margin: 15px 0; }
         .radio-options {
             display: flex;
@@ -132,7 +125,11 @@
         }
 
         .radio-option { flex: 1; position: relative; height: 100%; }
-        .radio-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0; height: 0;
+        }
 
         .radio-option label {
             display: flex;
@@ -155,8 +152,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        /* ===== Button ===== */
-        .calculate-btn {
+        button#calculate-btn {
             width: 100%;
             background: var(--primary);
             color: var(--white);
@@ -172,772 +168,621 @@
             justify-content: center;
             margin-top: 25px;
         }
-        .calculate-btn:active { transform: scale(0.98); }
 
-        /* ===== Modal ===== */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(15, 23, 42, 0.8);
-            display: none;
-            justify-content: center; align-items: center;
-            z-index: 1000; padding: 20px;
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background-color: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            width: 100%; max-width: 450px;
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-            cursor: pointer;
-        }
-        #modal-results-content { padding: 25px 15px; }
+        button#calculate-btn:active { transform: scale(0.98); }
 
-        /* ===== Result styles ===== */
-        .result-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0; font-size: 0.95rem; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-content { background-color: var(--white); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); width: 100%; max-width: 450px; position: relative; max-height: 90vh; overflow-y: auto; }
+        #modal-results-content { padding: 25px 15px; } 
+
+        .result-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0; font-size: 0.95rem; } 
         .result-text-value { display: inline-flex; gap: 12px; align-items: baseline; }
         .result-label { color: var(--text-main); font-weight: 500; }
         .result-value { color: var(--text-main); font-weight: 700; }
+
         hr { border: none; border-top: 1px solid #f1f5f9; margin: 15px 0; }
+
         .final-total-section { text-align: center; margin-top: 10px; }
-        .final-total-section p { font-size: 1rem; color: var(--text-main); margin: 0; }
-        .final-total-section span { font-size: 1.55rem; font-weight: 800; color: var(--secondary-green); display: block; margin-top: 5px; line-height: 1; }
+        .final-total-section p { font-size: 1rem; color: var(--text-main); margin: 0; } 
+        .final-total-section span { font-size: 1.55rem; font-weight: 800; color: var(--secondary-green); display: block; margin-top: 5px; line-height: 1; } 
+
         .table-container { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 15px; width: 100%; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; } 
+        th, td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; text-align: center; } 
         th { background-color: #f8fafc; color: var(--primary); font-weight: 700; }
 
-        /* ===== Daily avg (electricity only) ===== */
-        .daily-avg-container {
-            text-align: right;
-            font-size: 0.9rem;
-            padding: 12px;
-            line-height: 1.6;
-            border-radius: 12px;
-            margin: 20px 0;
-            box-sizing: border-box;
-            border: 1px solid transparent;
-        }
-        .avg-warning { background-color: #fff8e1; color: #bf360c; border-color: #ffecb3; }
-        .avg-danger  { background-color: #fef2f2; color: #991b1b; border-color: #fee2e2; }
+        .daily-avg-container { 
+            text-align: right; 
+            font-size: 0.9rem; 
+            padding: 12px; 
+            line-height: 1.6; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            box-sizing: border-box; 
+            border: 1px solid transparent; 
+        } 
 
-        /* ===== Footer ===== */
-        .simple-footer {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            padding: 20px 0 calc(15px + env(safe-area-inset-bottom, 0px));
+        .avg-warning { background-color: #fff8e1; color: #bf360c; border-color: #ffecb3; }
+        .avg-danger { background-color: #fef2f2; color: #991b1b; border-color: #fee2e2; }
+
+        .simple-footer { 
+            text-align: center; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            padding: 20px 0 calc(15px + env(safe-area-inset-bottom, 0px)); 
         }
         .simple-footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
 
-        /* ===== Swipe Drawer ===== */
+        /* ===== القائمة الجانبية بالإيماءات ===== */
         #swipe-drawer-overlay {
             position: fixed; inset: 0;
-            background: rgba(15,23,42,0.5);
+            background: rgba(15, 23, 42, 0.5);
             z-index: 2000;
-            opacity: 0; pointer-events: none;
+            opacity: 0;
+            pointer-events: none;
             transition: opacity 0.3s ease;
             backdrop-filter: blur(0px);
         }
-        #swipe-drawer-overlay.open { opacity: 1; pointer-events: all; }
-
+        #swipe-drawer-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
         #swipe-drawer {
             position: fixed;
-            top: 15px; left: 0; bottom: 15px;
-            width: 205px; height: auto;
+            top: 15px; left: 0;
+            bottom: 15px;
+            width: 205px;
+            height: auto;
             background: var(--primary);
             z-index: 2001;
             transform: translateX(-100%);
-            transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
-            display: flex; flex-direction: column;
+            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
             box-shadow: 8px 0 32px rgba(0,0,0,0.12);
             border-top-right-radius: 14px;
             border-bottom-right-radius: 14px;
             overflow: hidden;
         }
-        #swipe-drawer.open { transform: translateX(0); }
-
-        .drawer-header { background: var(--primary); padding: 28px 20px 22px; color: var(--white); }
-        .drawer-header h3 { font-size: 1.05rem; font-weight: 700; margin: 0; }
-        .drawer-items { flex: 1; padding: 16px 0; background: var(--white); }
+        #swipe-drawer.open {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            background: var(--primary);
+            padding: 28px 20px 22px;
+            color: var(--white);
+        }
+        .drawer-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .drawer-items {
+            flex: 1;
+            padding: 16px 0;
+            background: var(--white);
+        }
         .drawer-item {
-            display: flex; align-items: center; gap: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
             padding: 16px 20px;
-            cursor: pointer; border: none; background: none;
-            width: 100%; text-align: right;
-            font-size: 0.95rem; font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-size: 0.95rem;
+            font-weight: 600;
             color: var(--text-main);
             transition: background 0.15s;
             direction: rtl;
         }
         .drawer-item:active { background: var(--bg-light); }
         .drawer-item-icon {
-            width: 38px; height: 38px; border-radius: 10px;
+            width: 38px; height: 38px;
+            border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
-        .drawer-item-icon.blue  { background: var(--primary-light); color: var(--primary); }
+        .drawer-item-icon.blue { background: var(--primary-light); color: var(--primary); }
         .drawer-item-icon.green { background: #d1fae5; color: #059669; }
-        .drawer-item-icon.red   { background: #fee2e2; color: var(--error-red); }
+        .drawer-item-icon.red { background: #fee2e2; color: var(--error-red); }
         .drawer-divider { height: 1px; background: rgba(0,0,0,0.04); margin: 2px 16px; }
         #drawer-import-input { display: none; }
     </style>
 </head>
 <body>
 
-<div class="content-wrapper">
+    <div class="content-wrapper">
+        <div class="header-blue">
+            <h2>حاسبة الكهرباء الشهرية</h2>
+            <p>احسب فاتورتك بسهولة ودقة</p>
+        </div>
 
-    <!-- Header (click h2 to switch) -->
-    <div class="header-blue">
-        <h2>حاسبة الكهرباء والمياه</h2>
-        <p id="main-subtitle" onclick="switchCalc()" style="cursor:pointer;user-select:none;-webkit-user-select:none;">احسب فاتورتك بسهولة ودقة</p>
-
-    </div>
-
-    <!-- ===== قسم الكهرباء ===== -->
-    <div id="section-elec">
         <div class="card">
             <div class="input-group">
                 <div class="readings-container">
                     <div class="reading-input">
-                        <label for="e-previous-reading">القراءة السابقة</label>
-                        <input type="number" id="e-previous-reading" class="e-enter-next">
+                        <label for="previous-reading">القراءة السابقة</label>
+                        <input type="number" id="previous-reading" class="enter-to-next">
                     </div>
                     <div class="reading-input">
-                        <label for="e-current-reading">القراءة الحالية</label>
-                        <input type="number" id="e-current-reading" class="e-enter-next">
+                        <label for="current-reading">القراءة الحالية</label>
+                        <input type="number" id="current-reading" class="enter-to-next">
                     </div>
                 </div>
                 <div class="extra-inputs">
                     <div style="flex:1;">
                         <label>تاريخ الفاتورة السابقة</label>
-                        <input type="text" id="e-reading-day" placeholder="" inputmode="numeric" pattern="\d*" class="e-enter-next" autocomplete="off" spellcheck="false">
+                        <!-- استخدام inputmode numeric لاظهار لوحة الأرقام مع الاحتفاظ بالنص للشرط -->
+                        <input type="text" id="reading-day" placeholder="" inputmode="numeric" pattern="\d*" class="enter-to-next" autocomplete="off" spellcheck="false">
                     </div>
                     <div class="waste-input-wrapper">
-                        <label for="e-waste-fee">رسوم النفايات</label>
-                        <input type="number" id="e-waste-fee" value="3" class="e-enter-next">
+                        <label for="waste-fee">رسوم النفايات</label>
+                        <input type="number" id="waste-fee" value="3" class="enter-to-next">
                     </div>
                 </div>
             </div>
 
             <div class="radio-group">
-                <label style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع العداد</label>
+                <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 500;">نوع العداد</label>
                 <div class="radio-options">
                     <div class="radio-option">
-                        <input type="radio" id="e-phase-1" name="e-meter-phase" value="1" checked>
-                        <label for="e-phase-1"><span style="transform:translateY(2px);display:inline-block">1 فاز</span></label>
+                        <input type="radio" id="phase-1" name="meter-phase" value="1" checked>
+                        <label for="phase-1"><span style="transform:translateY(2px);display:inline-block">1 فاز</span></label>
                     </div>
                     <div class="radio-option">
-                        <input type="radio" id="e-phase-3" name="e-meter-phase" value="3">
-                        <label for="e-phase-3"><span style="transform:translateY(2px);display:inline-block">3 فاز</span></label>
+                        <input type="radio" id="phase-3" name="meter-phase" value="3">
+                        <label for="phase-3"><span style="transform:translateY(2px);display:inline-block">3 فاز</span></label>
                     </div>
                 </div>
             </div>
 
             <div class="radio-group">
-                <label style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع الاشتراك</label>
+                <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 500;">نوع الاشتراك</label>
                 <div class="radio-options">
                     <div class="radio-option">
-                        <input type="radio" id="e-sub-supported" name="e-subscription-type" value="supported" checked>
-                        <label for="e-sub-supported">مدعوم</label>
+                        <input type="radio" id="sub-supported" name="subscription-type" value="supported" checked>
+                        <label for="sub-supported">مدعوم</label>
                     </div>
                     <div class="radio-option">
-                        <input type="radio" id="e-sub-unsupported" name="e-subscription-type" value="unsupported">
-                        <label for="e-sub-unsupported">غير مدعوم</label>
+                        <input type="radio" id="sub-unsupported" name="subscription-type" value="unsupported">
+                        <label for="sub-unsupported">غير مدعوم</label>
                     </div>
                 </div>
             </div>
 
-            <button type="button" class="calculate-btn" onclick="elec_calculateAndSave()">احسب القيمة</button>
+            <button type="button" id="calculate-btn" onclick="calculateAndSave()">احسب القيمة</button>
         </div>
     </div>
 
-    <!-- ===== قسم المياه ===== -->
-    <div id="section-water" style="display:none">
-        <div class="card">
-            <div class="input-group">
-                <div class="readings-container">
-                    <div class="reading-input">
-                        <label for="w-previous-reading">القراءة السابقة</label>
-                        <input type="number" id="w-previous-reading" class="w-hide-kb">
-                    </div>
-                    <div class="reading-input">
-                        <label for="w-current-reading">القراءة الحالية</label>
-                        <input type="number" id="w-current-reading" class="w-hide-kb">
-                    </div>
-                </div>
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-results-content"></div>
+        </div>
+    </div>
+
+    <footer class="simple-footer">
+        طوّر بواسطة <a href="https://github.com/iofahmawi" target="_blank" rel="noopener noreferrer">iofahmawi</a>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- القائمة الجانبية بالإيماءات -->
+    <div id="swipe-drawer-overlay" onclick="closeDrawer()"></div>
+    <div id="swipe-drawer">
+        <div class="drawer-header">
+            <h3>الإعدادات</h3>
+        </div>
+        <div class="drawer-items">
+            <button class="drawer-item" onclick="drawerImport()">
+                <div class="drawer-item-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                <span>استيراد من ملف</span>
+            </button>
+            <div class="drawer-divider"></div>
+            <button class="drawer-item" onclick="drawerExport()">
+                <div class="drawer-item-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                <span>تصدير إلى ملف</span>
+            </button>
+            <div class="drawer-divider"></div>
+            <button class="drawer-item" onclick="drawerClear()">
+                <div class="drawer-item-icon red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+                <span>مسح البيانات</span>
+            </button>
+        </div>
+    </div>
+    <input type="file" id="drawer-import-input" accept=".json" onchange="drawerImportFile(event)">
+    <div id="swipe-edge-handle" style="position:fixed;top:0;left:0;width:28px;height:100%;z-index:1999;touch-action:none;"></div>
+
+    <!-- نافذة تأكيد المسح -->
+    <div id="clear-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+        <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
+            <div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
             </div>
-
-            <div class="radio-group">
-                <label style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">هل مخدوم بالصرف الصحي؟</label>
-                <div class="radio-options">
-                    <div class="radio-option">
-                        <input type="radio" id="w-sewer-yes" name="w-sewer-service" value="yes" checked>
-                        <label for="w-sewer-yes">نعم</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" id="w-sewer-no" name="w-sewer-service" value="no">
-                        <label for="w-sewer-no">لا</label>
-                    </div>
-                </div>
+            <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">مسح البيانات</p>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">سيتم حذف جميع البيانات المحفوظة بشكل نهائي</p>
+            <div style="display:flex;gap:10px;">
+                <button id="clear-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.9rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+                <button id="clear-confirm" style="flex:1;height:42px;border:none;background:var(--error-red);border-radius:12px;font-size:0.9rem;font-weight:700;color:white;cursor:pointer;">مسح</button>
             </div>
-
-            <button type="button" class="calculate-btn" onclick="water_runCalculation()">احسب القيمة</button>
         </div>
     </div>
+    <script>
+        // ترتيب الحقول للانتقال عند Enter
+        const fieldIds = ['current-reading', 'previous-reading', 'reading-day', 'waste-fee'];
 
-</div><!-- end content-wrapper -->
-
-<div id="result-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div id="modal-results-content"></div>
-    </div>
-</div>
-
-<footer class="simple-footer">
-    طوّر بواسطة <a href="https://github.com/iofahmawi" target="_blank" rel="noopener noreferrer">iofahmawi</a>
-</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-<!-- القائمة الجانبية (الكهرباء فقط) -->
-<div id="swipe-drawer-overlay" onclick="closeDrawer()"></div>
-<div id="swipe-drawer">
-    <div class="drawer-header"><h3>الإعدادات</h3></div>
-    <div class="drawer-items">
-        <button class="drawer-item" onclick="drawerImport()">
-            <div class="drawer-item-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-            <span>استيراد من ملف</span>
-        </button>
-        <div class="drawer-divider"></div>
-        <button class="drawer-item" onclick="drawerExport()">
-            <div class="drawer-item-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-            <span>تصدير إلى ملف</span>
-        </button>
-        <div class="drawer-divider"></div>
-        <button class="drawer-item" onclick="drawerClear()">
-            <div class="drawer-item-icon red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
-            <span>مسح البيانات</span>
-        </button>
-    </div>
-</div>
-<input type="file" id="drawer-import-input" accept=".json" onchange="drawerImportFile(event)">
-<div id="swipe-edge-handle" style="position:fixed;top:0;left:0;width:28px;height:100%;z-index:1999;touch-action:none;"></div>
-
-<!-- نافذة تأكيد المسح -->
-<div id="clear-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
-    <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
-        <div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        </div>
-        <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">مسح البيانات</p>
-        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">سيتم حذف جميع البيانات المحفوظة بشكل نهائي</p>
-        <div style="display:flex;gap:10px;">
-            <button id="clear-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.9rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
-            <button id="clear-confirm" style="flex:1;height:42px;border:none;background:var(--error-red);border-radius:12px;font-size:0.9rem;font-weight:700;color:white;cursor:pointer;">مسح</button>
-        </div>
-    </div>
-</div>
-
-<script>
-
-// =============================================
-// التبديل بين الحاسبتين
-// =============================================
-let activeCalc = 'elec';
-
-function switchCalc() {
-    if (activeCalc === 'elec') {
-        activeCalc = 'water';
-        document.getElementById('section-elec').style.display = 'none';
-        document.getElementById('section-water').style.display = 'block';
-        document.getElementById('main-subtitle').textContent = 'احسب فاتورتك بسهولة ودقة';
-        document.getElementById('swipe-edge-handle').style.display = '';
-    } else {
-        activeCalc = 'elec';
-        document.getElementById('section-water').style.display = 'none';
-        document.getElementById('section-elec').style.display = 'block';
-        document.getElementById('main-subtitle').textContent = 'احسب فاتورتك بسهولة ودقة';
-    }
-}
-
-// =============================================
-// مشترك
-// =============================================
-function formatNumber(num) { return parseFloat(num).toString(); }
-function elec_fmt(num)  { return formatNumber(num.toFixed(3)); }
-function water_fmt(num) { return formatNumber(num.toFixed(2)); }
-
-function showModal(html, downloadName) {
-    const modal = document.getElementById('result-modal');
-    const modalContentDiv = document.getElementById('modal-results-content');
-    modalContentDiv.innerHTML = html;
-    modal.style.display = 'flex';
-    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-    document.querySelector('.modal-content').onclick = (event) => {
-        event.stopPropagation();
-        const el = document.querySelector('.modal-content');
-        const prevMaxHeight = el.style.maxHeight;
-        const prevOverflow = el.style.overflowY;
-        el.style.maxHeight = 'none';
-        el.style.overflowY = 'visible';
-        html2canvas(el, { scale: window.devicePixelRatio * 3, useCORS: true }).then(canvas => {
-            el.style.maxHeight = prevMaxHeight;
-            el.style.overflowY = prevOverflow;
-            const link = document.createElement('a');
-            const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-            link.download = `${downloadName}-${today}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+        // إضافة معالج keypress لكل حقل بناءً على الفئة enter-to-next
+        document.querySelectorAll('.enter-to-next').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // منع أي سلوك افتراضي
+                    const currentId = this.id;
+                    const currentIndex = fieldIds.indexOf(currentId);
+                    if (currentIndex !== -1 && currentIndex < fieldIds.length - 1) {
+                        // الانتقال إلى الحقل التالي
+                        const nextId = fieldIds[currentIndex + 1];
+                        document.getElementById(nextId).focus();
+                    } else {
+                        // إذا كان آخر حقل، نخفي لوحة المفاتيح
+                        this.blur();
+                    }
+                }
+            });
         });
-    };
-}
 
-// =============================================
-// حاسبة الكهرباء
-// =============================================
+        // دالة تحويل التاريخ: تقبل أي صيغة وتعرض DD-MM-YYYY بصرياً وتخزن YYYY-MM-DD في data-value
+        function convertToYMD(input) {
+            let val = input.value.trim().replace(/\s+/g, '');
+            if (!val) return;
 
-// ترتيب الحقول للانتقال بـ Enter
-const elec_fieldIds = ['e-current-reading', 'e-previous-reading', 'e-reading-day', 'e-waste-fee'];
-document.querySelectorAll('.e-enter-next').forEach(input => {
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const idx = elec_fieldIds.indexOf(this.id);
-            if (idx !== -1 && idx < elec_fieldIds.length - 1) {
-                document.getElementById(elec_fieldIds[idx + 1]).focus();
+            let day, month, year, m;
+
+            const ddmmyyyy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/;
+            const yyyymmdd = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+
+            if ((m = val.match(ddmmyyyy))) {
+                day = m[1].padStart(2, '0');
+                month = m[2].padStart(2, '0');
+                year = m[3];
+            } else if ((m = val.match(yyyymmdd))) {
+                year = m[1];
+                month = m[2].padStart(2, '0');
+                day = m[3].padStart(2, '0');
             } else {
-                this.blur();
+                return;
+            }
+
+            input.dataset.value = `${year}-${month}-${day}`;
+            input.value = `${year}-${month}-${day}`;
+        }
+
+        // ربط حدث فقدان التركيز لحقل التاريخ (للتحويل)
+        document.getElementById('reading-day').addEventListener('blur', function() {
+            convertToYMD(this);
+        });
+
+        function formatNumber(num) { return parseFloat(num).toString(); }
+        function formatCurrency(num) { return formatNumber(num.toFixed(3)); }
+
+        function getFullCost(cons, subType, waste, phase) {
+            let energyCost = 0;
+            let remaining = cons;
+            let tariffs = subType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
+            let acc = 0;
+            for (let i = 0; i < tariffs.length && remaining > 0; i++) {
+                const [limit, price] = tariffs[i];
+                const size = (limit === Infinity) ? Infinity : (limit - acc);
+                const used = Math.min(remaining, size);
+                energyCost += used * price;
+                remaining -= used;
+                acc += used;
+            }
+            let support = 0;
+            if (subType === 'supported') {
+                if (cons >= 51 && cons <= 200) support = 2.5;
+                else if (cons >= 201 && cons <= 600) support = 2.0;
+            }
+            let meterFee = (phase == 3) ? 0.50 : 0.20;
+            const fixedFees = waste + 1.0 + meterFee + (cons / 1000);
+            return (energyCost + fixedFees) - support;
+        }
+
+        function calculateAndSave() {
+            if (document.activeElement) document.activeElement.blur();
+            const success = calculateElectricBill();
+            if (success) {
+                localStorage.setItem('calculator_currentReading', document.getElementById('current-reading').value);
+                localStorage.setItem('calculator_previousReading', document.getElementById('previous-reading').value);
+                localStorage.setItem('calculator_day', document.getElementById('reading-day').dataset.value || document.getElementById('reading-day').value);
+                localStorage.setItem('calculator_waste', document.getElementById('waste-fee').value);
+                localStorage.setItem('calculator_phase', document.querySelector('input[name="meter-phase"]:checked').value);
+                localStorage.setItem('calculator_subscriptionType', document.querySelector('input[name="subscription-type"]:checked').value);
             }
         }
-    });
-});
 
-function convertToYMD(input) {
-    let val = input.value.trim().replace(/\s+/g, '');
-    if (!val) return;
-    let day, month, year, m;
-    const ddmmyyyy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/;
-    const yyyymmdd = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
-    if ((m = val.match(ddmmyyyy))) {
-        day = m[1].padStart(2, '0');
-        month = m[2].padStart(2, '0');
-        year = m[3];
-    } else if ((m = val.match(yyyymmdd))) {
-        year = m[1];
-        month = m[2].padStart(2, '0');
-        day = m[3].padStart(2, '0');
-    } else {
-        return;
-    }
-    input.dataset.value = `${year}-${month}-${day}`;
-    input.value = `${year}-${month}-${day}`;
-}
+        function calculateElectricBill() {
+            const currentReadingInput = document.getElementById('current-reading');
+            const previousReadingInput = document.getElementById('previous-reading');
+            const readingDayInput = document.getElementById('reading-day');
+            const wasteInput = document.getElementById('waste-fee');
+            const phaseInput = document.querySelector('input[name="meter-phase"]:checked');
+            const subscriptionTypeInput = document.querySelector('input[name="subscription-type"]:checked');
 
-document.getElementById('e-reading-day').addEventListener('blur', function() {
-    convertToYMD(this);
-});
+            const modal = document.getElementById('result-modal');
+            const modalContentDiv = document.getElementById('modal-results-content');
 
-function getFullCost(cons, subType, waste, phase) {
-    let energyCost = 0;
-    let remaining = cons;
-    let tariffs = subType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
-    let acc = 0;
-    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
-        const [limit, price] = tariffs[i];
-        const size = (limit === Infinity) ? Infinity : (limit - acc);
-        const used = Math.min(remaining, size);
-        energyCost += used * price;
-        remaining -= used;
-        acc += used;
-    }
-    let support = 0;
-    if (subType === 'supported') {
-        if (cons >= 51 && cons <= 200) support = 2.5;
-        else if (cons >= 201 && cons <= 600) support = 2.0;
-    }
-    let meterFee = (phase == 3) ? 0.50 : 0.20;
-    const fixedFees = waste + 1.0 + meterFee + (cons / 1000);
-    return (energyCost + fixedFees) - support;
-}
+            const currentReadingValue = currentReadingInput.value.trim();
+            const previousReadingValue = previousReadingInput.value.trim();
+            const readingDayValue = (readingDayInput.dataset.value || readingDayInput.value).trim();
+            const wasteFeeValue = wasteInput.value.trim() === "" ? 3 : parseFloat(wasteInput.value);
+            const phaseValue = parseInt(phaseInput.value);
 
-function elec_calculateAndSave() {
-    if (document.activeElement) document.activeElement.blur();
-    const success = calculateElectricBill();
-    if (success) {
-        localStorage.setItem('calculator_currentReading', document.getElementById('e-current-reading').value);
-        localStorage.setItem('calculator_previousReading', document.getElementById('e-previous-reading').value);
-        localStorage.setItem('calculator_day', document.getElementById('e-reading-day').dataset.value || document.getElementById('e-reading-day').value);
-        localStorage.setItem('calculator_waste', document.getElementById('e-waste-fee').value);
-        localStorage.setItem('calculator_phase', document.querySelector('input[name="e-meter-phase"]:checked').value);
-        localStorage.setItem('calculator_subscriptionType', document.querySelector('input[name="e-subscription-type"]:checked').value);
-    }
-}
+            if (currentReadingValue === '') {
+                modalContentDiv.innerHTML = '<p style="color:var(--error-red); text-align:center; font-weight:bold; padding: 20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>';
+                modal.style.display = 'flex';
+                modal.onclick = (event) => { if (event.target === modal) modal.style.display = 'none'; };
+                return false;
+            }
 
-function calculateElectricBill() {
-    const currentReadingInput    = document.getElementById('e-current-reading');
-    const previousReadingInput   = document.getElementById('e-previous-reading');
-    const readingDayInput        = document.getElementById('e-reading-day');
-    const wasteInput             = document.getElementById('e-waste-fee');
-    const phaseInput             = document.querySelector('input[name="e-meter-phase"]:checked');
-    const subscriptionTypeInput  = document.querySelector('input[name="e-subscription-type"]:checked');
+            const currentReading = parseFloat(currentReadingValue);
+            const hasPrevious = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
+            const previousReading = hasPrevious ? parseFloat(previousReadingValue) : 0;
+            const consumption = currentReading - previousReading;
+            const subscriptionType = subscriptionTypeInput.value;
 
-    const currentReadingValue  = currentReadingInput.value.trim();
-    const previousReadingValue = previousReadingInput.value.trim();
-    const readingDayValue      = (readingDayInput.dataset.value || readingDayInput.value).trim();
-    const wasteFeeValue        = wasteInput.value.trim() === "" ? 3 : parseFloat(wasteInput.value);
-    const phaseValue           = parseInt(phaseInput.value);
+            if (consumption < 0) {
+                modalContentDiv.innerHTML = '<p style="color:var(--error-red); text-align:center; font-weight:bold; padding: 20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>';
+                modal.style.display = 'flex';
+                modal.onclick = (event) => { if (event.target === modal) modal.style.display = 'none'; };
+                return false;
+            }
 
-    if (currentReadingValue === '') {
-        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>', 'فاتورة-الكهرباء');
-        return false;
-    }
+            let avgDivHtml = "";
+            if (hasPrevious && readingDayValue !== "") {
+                const dateParts = readingDayValue.split("-");
+                if (dateParts.length === 3) {
+                    const y = parseInt(dateParts[0], 10);
+                    const m = parseInt(dateParts[1], 10) - 1;
+                    const d = parseInt(dateParts[2], 10);
+                    const startDate = new Date(y, m, d, 9, 0, 0, 0);
+                    const now = new Date();
+                    const diffMs = now - startDate;
+                    const diffHours = diffMs / (1000 * 60 * 60);
+                    let diffDays = diffHours > 0 ? diffHours / 24 : 1;
+                    const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
+                    const dailyAvg = formatNumber(dailyAvgRaw);
 
-    const currentReading  = parseFloat(currentReadingValue);
-    const hasPrevious     = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
-    const previousReading = hasPrevious ? parseFloat(previousReadingValue) : 0;
-    const consumption     = currentReading - previousReading;
-    const subscriptionType = subscriptionTypeInput.value;
+                    const roundedDays = Math.floor(diffDays);
+                    let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
+                    let predictionHtml = "";
+                    let trafficClass = "avg-warning"; 
 
-    if (consumption < 0) {
-        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>', 'فاتورة-الكهرباء');
-        return false;
-    }
+                    const endDateOfCycle = new Date(y, m + 1, d);
+                    const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
 
-    let avgDivHtml = "";
-    if (hasPrevious && readingDayValue !== "") {
-        const dateParts = readingDayValue.split("-");
-        if (dateParts.length === 3) {
-            const y = parseInt(dateParts[0], 10);
-            const m = parseInt(dateParts[1], 10) - 1;
-            const d = parseInt(dateParts[2], 10);
-            const startDate = new Date(y, m, d, 9, 0, 0, 0);
-            const now = new Date();
-            const diffMs = now - startDate;
-            const diffHours = diffMs / (1000 * 60 * 60);
-            let diffDays = diffHours > 0 ? diffHours / 24 : 1;
-            const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
-            const dailyAvg = formatNumber(dailyAvgRaw);
-            const roundedDays = Math.floor(diffDays);
-            let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
-            let trafficClass = "avg-warning";
-            const endDateOfCycle = new Date(y, m + 1, d);
-            const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
-            const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
-            const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
+                    const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
+                    const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
+
+                    if (subscriptionType === 'supported') {
+                        if (predictedCons > 600) trafficClass = "avg-danger";
+                        else trafficClass = "avg-warning";
+                    } else {
+                        if (predictedCons > 1000) trafficClass = "avg-danger";
+                        else trafficClass = "avg-warning";
+                    }
+
+                    predictionHtml = `<div style="margin-top: 5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> كيلوواط <strong>${formatCurrency(predictedBill)}</strong> دينار</div>`;
+                    avgDivHtml = `<div class="daily-avg-container ${trafficClass}">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> كيلوواط${predictionHtml}</div>`;
+                }
+            }
+
+            let totalEnergyCost = 0.0;
+            let tableRowsHtml = '';
+            let remaining = consumption;
+            let tariffs = subscriptionType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
+            let acc_cons = 0; 
+            for (let i = 0; i < tariffs.length && remaining > 0; i++) {
+                const [limit, price] = tariffs[i];
+                const start = acc_cons + 1;
+                const end = limit === Infinity ? Infinity : limit;
+                const size = end - acc_cons;
+                const used = Math.min(remaining, size);
+                const cost = parseFloat((used * price).toFixed(5));
+                totalEnergyCost += cost;
+                remaining -= used;
+                acc_cons += used; 
+                let label = limit === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
+                if (used > 0) {
+                    tableRowsHtml += `<tr><td>${label}</td><td>${formatNumber(used)}</td><td>${formatCurrency(price)}</td><td>${formatCurrency(cost)}</td></tr>`;
+                }
+            }
+
+            let governmentSupport = 0.0;
             if (subscriptionType === 'supported') {
-                trafficClass = predictedCons > 600 ? "avg-danger" : "avg-warning";
-            } else {
-                trafficClass = predictedCons > 1000 ? "avg-danger" : "avg-warning";
+                if (consumption >= 51 && consumption <= 200) governmentSupport = 2.5;
+                else if (consumption >= 201 && consumption <= 600) governmentSupport = 2.0;
             }
-            const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> كيلوواط <strong>${elec_fmt(predictedBill)}</strong> دينار</div>`;
-            avgDivHtml = `<div class="daily-avg-container ${trafficClass}">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> كيلوواط${predictionHtml}</div>`;
-        }
-    }
+            const wasteFee = wasteFeeValue, tvFee = 1.0, meterFee = (phaseValue == 3 ? 0.50 : 0.20), ruralFilss = consumption / 1000; 
+            const totalBillBeforeSupport = totalEnergyCost + wasteFee + tvFee + meterFee + ruralFilss;
+            const finalTotal = totalBillBeforeSupport - governmentSupport;
 
-    let totalEnergyCost = 0.0;
-    let tableRowsHtml = '';
-    let remaining = consumption;
-    let tariffs = subscriptionType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
-    let acc_cons = 0;
-    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
-        const [limit, price] = tariffs[i];
-        const start = acc_cons + 1;
-        const end = limit === Infinity ? Infinity : limit;
-        const size = end - acc_cons;
-        const used = Math.min(remaining, size);
-        const cost = parseFloat((used * price).toFixed(5));
-        totalEnergyCost += cost;
-        remaining -= used;
-        acc_cons += used;
-        let label = limit === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
-        if (used > 0) {
-            tableRowsHtml += `<tr><td>${label}</td><td>${formatNumber(used)}</td><td>${elec_fmt(price)}</td><td>${elec_fmt(cost)}</td></tr>`;
-        }
-    }
+            const resultTitle = subscriptionType === 'supported' ? 'اشتراك مدعوم' : 'اشتراك غير مدعوم';
+            const titleColor = 'var(--secondary-green)'; 
 
-    let governmentSupport = 0.0;
-    if (subscriptionType === 'supported') {
-        if (consumption >= 51 && consumption <= 200) governmentSupport = 2.5;
-        else if (consumption >= 201 && consumption <= 600) governmentSupport = 2.0;
-    }
-    const wasteFee = wasteFeeValue, tvFee = 1.0, meterFee = (phaseValue == 3 ? 0.50 : 0.20), ruralFilss = consumption / 1000;
-    const totalBillBeforeSupport = totalEnergyCost + wasteFee + tvFee + meterFee + ruralFilss;
-    const finalTotal = totalBillBeforeSupport - governmentSupport;
-    const resultTitle = subscriptionType === 'supported' ? 'اشتراك مدعوم' : 'اشتراك غير مدعوم';
+            modalContentDiv.innerHTML = `
+                <div style="width: 100%; text-align: center; margin-bottom: 20px; display: block;">
+                    <h2 style="color: ${titleColor}; margin: 0 auto; font-size: 1.1rem; font-weight: 700; width: fit-content; display: inline-block;">${resultTitle}</h2>
+                </div>
+                ${avgDivHtml}
+                <div class="result-row" style="margin-top: 15px; margin-bottom: 10px;"><span class="result-label" style="font-weight: bold;">كلفة الاستهلاك الحالي ${formatNumber(consumption)} كيلوواط:</span></div>
+                <div class="table-container">
+                    <table><thead><tr><th>الشريحة</th><th>الاستهلاك</th><th>التعرفة</th><th>الإجمالي</th></tr></thead>
+                    <tbody>${tableRowsHtml}</tbody></table>
+                </div>
+                <div class="result-row" style="margin-bottom: 10px;"><span class="result-label" style="font-weight: bold;">رسوم إضافية:</span></div>
+                <div class="table-container" style="margin-bottom: 5px;">
+                    <table><thead><tr><th>تلفزيون</th><th>نفايات</th><th>عداد</th><th>فلس الريف</th></tr></thead>
+                    <tbody><tr><td>${formatCurrency(tvFee)}</td><td>${formatCurrency(wasteFee)}</td><td>${formatCurrency(meterFee)}</td><td>${formatCurrency(ruralFilss)}</td></tr></tbody></table>
+                </div>
+                <div class="result-row" style="margin-top: 20px;"><span class="result-text-value"><span class="result-label">الإجمالي قبل الدعم:</span><span class="result-value">${formatCurrency(totalBillBeforeSupport)}</span></span></div>
+                <div class="result-row"><span class="result-text-value"><span class="result-label">قيمة الدعم الحكومي:</span><span class="result-value">${formatCurrency(governmentSupport)}</span></span></div>
+                <hr>
+                <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${formatCurrency(finalTotal)}</span></div>
+            `;
 
-    const html = `
-        <div style="width:100%;text-align:center;margin-bottom:20px;display:block;">
-            <h2 style="color:var(--secondary-green);margin:0 auto;font-size:1.1rem;font-weight:700;width:fit-content;display:inline-block;">${resultTitle}</h2>
-        </div>
-        ${avgDivHtml}
-        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">كلفة الاستهلاك الحالي ${formatNumber(consumption)} كيلوواط:</span></div>
-        <div class="table-container">
-            <table><thead><tr><th>الشريحة</th><th>الاستهلاك</th><th>التعرفة</th><th>الإجمالي</th></tr></thead>
-            <tbody>${tableRowsHtml}</tbody></table>
-        </div>
-        <div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">رسوم إضافية:</span></div>
-        <div class="table-container" style="margin-bottom:5px;">
-            <table><thead><tr><th>تلفزيون</th><th>نفايات</th><th>عداد</th><th>فلس الريف</th></tr></thead>
-            <tbody><tr><td>${elec_fmt(tvFee)}</td><td>${elec_fmt(wasteFee)}</td><td>${elec_fmt(meterFee)}</td><td>${elec_fmt(ruralFilss)}</td></tr></tbody></table>
-        </div>
-        <div class="result-row" style="margin-top:20px;"><span class="result-text-value"><span class="result-label">الإجمالي قبل الدعم:</span><span class="result-value">${elec_fmt(totalBillBeforeSupport)}</span></span></div>
-        <div class="result-row"><span class="result-text-value"><span class="result-label">قيمة الدعم الحكومي:</span><span class="result-value">${elec_fmt(governmentSupport)}</span></span></div>
-        <hr>
-        <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${elec_fmt(finalTotal)}</span></div>
-    `;
-
-    showModal(html, 'فاتورة-الكهرباء');
-    return true;
-}
-
-// =============================================
-// حاسبة المياه
-// =============================================
-
-document.querySelectorAll('.w-hide-kb').forEach(input => {
-    input.addEventListener('keypress', function(e) { if (e.key === 'Enter') { this.blur(); } });
-});
-
-function water_runCalculation() {
-    if (document.activeElement) document.activeElement.blur();
-    const success = calculateWaterBill();
-    if (success) {
-        localStorage.setItem('water_currentReading', document.getElementById('w-current-reading').value);
-        localStorage.setItem('water_previousReading', document.getElementById('w-previous-reading').value);
-        localStorage.setItem('water_sewerService', document.querySelector('input[name="w-sewer-service"]:checked').value);
-    }
-}
-
-function calculateWaterBill() {
-    const currentReadingInput  = document.getElementById('w-current-reading');
-    const previousReadingInput = document.getElementById('w-previous-reading');
-    const isSewerService       = document.getElementById('w-sewer-yes').checked;
-
-    const currentReadingValue  = currentReadingInput.value.trim();
-    const previousReadingValue = previousReadingInput.value.trim();
-
-    if (currentReadingValue === '') {
-        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-المياه');
-        return false;
-    }
-
-    const currentReading  = parseFloat(currentReadingValue);
-    const hasPrevious     = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
-    const previousReading = hasPrevious ? parseFloat(previousReadingValue) : 0;
-
-    if (hasPrevious && currentReading < previousReading) {
-        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-المياه');
-        return false;
-    }
-
-    const consumption = currentReading - previousReading;
-    const waterTariffs = [ [6, 0.60], [6, 0.80], [6, 1.10], [6, 1.40], [12, 1.80] ];
-    const sewerTariffs = [ [6, 0.15], [6, 0.50], [6, 0.70], [6, 0.85], [12, 0.95] ];
-    const sliceNames   = [ "7 - 12", "13 - 18", "19 - 24", "25 - 30", "31 - 42", "43 فما فوق" ];
-
-    let waterTotal = 0.0, sewerTotal = 0.0, tableRowsHtml = '';
-
-    if (consumption <= 6) {
-        waterTotal = 2.50;
-        sewerTotal = isSewerService ? 0.23 : 0.0;
-        tableRowsHtml = `<tr><td>0 - 6</td><td>${formatNumber(consumption)}</td><td>2.50</td><td>${isSewerService ? '0.23' : '0'}</td></tr>`;
-    } else {
-        waterTotal = 2.50;
-        sewerTotal = isSewerService ? 0.23 : 0.0;
-        tableRowsHtml = `<tr><td>0 - 6</td><td>6</td><td>2.50</td><td>${isSewerService ? '0.23' : '0'}</td></tr>`;
-
-        let remaining = consumption - 6;
-        for (let i = 0; i < waterTariffs.length; i++) {
-            if (remaining <= 0) break;
-            const [blockSize, waterPrice] = waterTariffs[i];
-            const [_, sewerPrice] = sewerTariffs[i];
-            const used = Math.min(remaining, blockSize);
-            waterTotal += used * waterPrice;
-            if (isSewerService) sewerTotal += used * sewerPrice;
-            remaining -= used;
-            tableRowsHtml += `<tr><td>${sliceNames[i]}</td><td>${formatNumber(used)}</td><td>${water_fmt(waterPrice)}</td><td>${isSewerService ? water_fmt(sewerPrice) : '0'}</td></tr>`;
+            modal.style.display = 'flex';
+            modal.onclick = (event) => { if (event.target === modal) modal.style.display = 'none'; };
+            document.querySelector('.modal-content').onclick = (event) => {
+                event.stopPropagation();
+                const el = document.querySelector('.modal-content');
+                const prevMaxHeight = el.style.maxHeight;
+                const prevOverflow = el.style.overflowY;
+                el.style.maxHeight = 'none';
+                el.style.overflowY = 'visible';
+                html2canvas(el, { scale: window.devicePixelRatio * 3, useCORS: true }).then(canvas => {
+                    el.style.maxHeight = prevMaxHeight;
+                    el.style.overflowY = prevOverflow;
+                    const link = document.createElement('a');
+                    const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                    link.download = `فاتورة-الكهرباء-${today}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            };
+            return true;
         }
 
-        if (remaining > 0) {
-            const waterPrice = 2.20, sewerPrice = 1.20;
-            waterTotal += remaining * waterPrice;
-            if (isSewerService) sewerTotal += remaining * sewerPrice;
-            tableRowsHtml += `<tr><td>${sliceNames[5]}</td><td>${formatNumber(remaining)}</td><td>${water_fmt(waterPrice)}</td><td>${isSewerService ? water_fmt(sewerPrice) : '0'}</td></tr>`;
+        window.onload = () => {
+            if (localStorage.getItem('calculator_currentReading')) {
+                document.getElementById('current-reading').value = localStorage.getItem('calculator_currentReading');
+                document.getElementById('previous-reading').value = localStorage.getItem('calculator_previousReading');
+
+                const savedDay = localStorage.getItem('calculator_day') || '';
+                if (savedDay) {
+                    document.getElementById('reading-day').value = savedDay;
+                    convertToYMD(document.getElementById('reading-day'));
+                }
+
+                document.getElementById('waste-fee').value = localStorage.getItem('calculator_waste') || '3';
+                const savedPhase = localStorage.getItem('calculator_phase');
+                if (savedPhase) {
+                    const phaseRadio = document.getElementById(`phase-${savedPhase}`);
+                    if(phaseRadio) phaseRadio.checked = true;
+                }
+                const savedSub = localStorage.getItem('calculator_subscriptionType');
+                if (savedSub) {
+                    const radio = document.getElementById(`sub-${savedSub}`);
+                    if(radio) radio.checked = true;
+                }
+            }
+        };
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Failed', err));
+            });
         }
-    }
 
-    const finalTotal = waterTotal + sewerTotal;
+        // ===== القائمة الجانبية بالإيماءات =====
+        const drawer = document.getElementById('swipe-drawer');
+        const drawerOverlay = document.getElementById('swipe-drawer-overlay');
+        const edgeHandle = document.getElementById('swipe-edge-handle');
+        let drawerIsOpen = false;
+        let sX = 0, sY = 0;
 
-    const html = `
-        <div style="width:100%;text-align:center;margin-bottom:20px;">
-            <h2 style="color:var(--secondary-green);font-size:1.1rem;font-weight:700;">${isSewerService ? 'مخدوم بالصرف الصحي' : 'غير مخدوم بالصرف'}</h2>
-        </div>
-        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">تفاصيل استهلاك ${formatNumber(consumption)} م³:</span></div>
-        <div class="table-container">
-            <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
-            <tbody>${tableRowsHtml}</tbody></table>
-        </div>
-        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي المياه:</span><span class="result-value">${water_fmt(waterTotal)}</span></span></div>
-        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي الصرف:</span><span class="result-value">${water_fmt(sewerTotal)}</span></span></div>
-        <hr>
-        <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${water_fmt(finalTotal)}</span></div>
-    `;
+        function openDrawer()  { drawerIsOpen = true;  drawer.classList.add('open');    drawerOverlay.classList.add('open');    }
+        function closeDrawer() { drawerIsOpen = false; drawer.classList.remove('open'); drawerOverlay.classList.remove('open'); }
 
-    showModal(html, 'فاتورة-المياه');
-    return true;
-}
+        // الحافة اليسرى: منع Chrome من اعتراض السحب
+        edgeHandle.addEventListener('touchstart', e => {
+            e.preventDefault();
+            sX = e.touches[0].clientX;
+            sY = e.touches[0].clientY;
+        }, { passive: false });
 
-// =============================================
-// window.onload — تحميل البيانات المحفوظة
-// =============================================
-window.onload = () => {
-    // الكهرباء
-    if (localStorage.getItem('calculator_currentReading')) {
-        document.getElementById('e-current-reading').value  = localStorage.getItem('calculator_currentReading');
-        document.getElementById('e-previous-reading').value = localStorage.getItem('calculator_previousReading');
-        const savedDay = localStorage.getItem('calculator_day') || '';
-        if (savedDay) {
-            document.getElementById('e-reading-day').value = savedDay;
-            convertToYMD(document.getElementById('e-reading-day'));
-        }
-        document.getElementById('e-waste-fee').value = localStorage.getItem('calculator_waste') || '3';
-        const savedPhase = localStorage.getItem('calculator_phase');
-        if (savedPhase) {
-            const phaseRadio = document.getElementById(`e-phase-${savedPhase}`);
-            if (phaseRadio) phaseRadio.checked = true;
-        }
-        const savedSub = localStorage.getItem('calculator_subscriptionType');
-        if (savedSub) {
-            const radio = document.getElementById(`e-sub-${savedSub}`);
-            if (radio) radio.checked = true;
-        }
-    }
-    // المياه
-    const savedWaterCurrent = localStorage.getItem('water_currentReading');
-    if (savedWaterCurrent) {
-        document.getElementById('w-current-reading').value  = savedWaterCurrent;
-        document.getElementById('w-previous-reading').value = localStorage.getItem('water_previousReading');
-        const savedSewer = localStorage.getItem('water_sewerService');
-        if (savedSewer) document.getElementById(savedSewer === 'yes' ? 'w-sewer-yes' : 'w-sewer-no').checked = true;
-    }
-};
+        edgeHandle.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - sX;
+            const dy = e.changedTouches[0].clientY - sY;
+            if (Math.abs(dx) > Math.abs(dy) && dx > 40) openDrawer();
+        }, { passive: true });
 
-// =============================================
-// Service Worker
-// =============================================
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(() => console.log('SW Registered'))
-            .catch(err => console.log('SW Failed', err));
-    });
-}
+        // الإغلاق بالسحب على أي مكان
+        document.addEventListener('touchstart', e => {
+            sX = e.touches[0].clientX;
+            sY = e.touches[0].clientY;
+        }, { passive: true });
 
-// =============================================
-// القائمة الجانبية (الكهرباء)
-// =============================================
-const drawer        = document.getElementById('swipe-drawer');
-const drawerOverlay = document.getElementById('swipe-drawer-overlay');
-const edgeHandle    = document.getElementById('swipe-edge-handle');
-let drawerIsOpen = false;
-let sX = 0, sY = 0;
+        document.addEventListener('touchend', e => {
+            if (!drawerIsOpen) return;
+            const dx = e.changedTouches[0].clientX - sX;
+            const dy = e.changedTouches[0].clientY - sY;
+            if (Math.abs(dx) > Math.abs(dy) && dx < -40) closeDrawer();
+        }, { passive: true });
 
-function openDrawer()  { drawerIsOpen = true;  drawer.classList.add('open');    drawerOverlay.classList.add('open');    }
-function closeDrawer() { drawerIsOpen = false; drawer.classList.remove('open'); drawerOverlay.classList.remove('open'); }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
-edgeHandle.addEventListener('touchstart', e => {
-    e.preventDefault();
-    sX = e.touches[0].clientX;
-    sY = e.touches[0].clientY;
-}, { passive: false });
+        // ===== وظائف الاستيراد والتصدير ومسح البيانات =====
+        const DATA_KEYS = [
+            'calculator_currentReading',
+            'calculator_previousReading',
+            'calculator_day',
+            'calculator_waste',
+            'calculator_phase',
+            'calculator_subscriptionType'
+        ];
 
-edgeHandle.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - sX;
-    const dy = e.changedTouches[0].clientY - sY;
-    if (Math.abs(dx) > Math.abs(dy) && dx > 40) openDrawer();
-}, { passive: true });
-
-document.addEventListener('touchstart', e => {
-    sX = e.touches[0].clientX;
-    sY = e.touches[0].clientY;
-}, { passive: true });
-
-document.addEventListener('touchend', e => {
-    if (!drawerIsOpen) return;
-    const dx = e.changedTouches[0].clientX - sX;
-    const dy = e.changedTouches[0].clientY - sY;
-    if (Math.abs(dx) > Math.abs(dy) && dx < -40) closeDrawer();
-}, { passive: true });
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
-
-// =============================================
-// تصدير / استيراد / مسح (الكهرباء)
-// =============================================
-const ALL_DATA_KEYS = [
-    'calculator_currentReading',
-    'calculator_previousReading',
-    'calculator_day',
-    'calculator_waste',
-    'calculator_phase',
-    'calculator_subscriptionType',
-    'water_currentReading',
-    'water_previousReading',
-    'water_sewerService'
-];
-
-function drawerExport() {
-    const data = {};
-    ALL_DATA_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) data[k] = v; });
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    const now = new Date();
-    a.download = `bill ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}.json`;
-    a.click();
-    closeDrawer();
-}
-
-function drawerImport() {
-    document.getElementById('drawer-import-input').click();
-}
-
-function drawerImportFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-        try {
-            const data = JSON.parse(ev.target.result);
-            ALL_DATA_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem(k, data[k]); });
+        function drawerExport() {
+            const data = {};
+            DATA_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) data[k] = v; });
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            const now = new Date();
+            a.download = `e-bill ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}.json`;
+            a.click();
             closeDrawer();
-            location.reload();
-        } catch {
-            alert('الملف غير صالح');
         }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-}
 
-function drawerClear() {
-    closeDrawer();
-    document.getElementById('clear-modal').style.display = 'flex';
-}
+        function drawerImport() {
+            document.getElementById('drawer-import-input').click();
+        }
 
-document.getElementById('clear-cancel').onclick = () => {
-    document.getElementById('clear-modal').style.display = 'none';
-};
+        function drawerImportFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    DATA_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem(k, data[k]); });
+                    closeDrawer();
+                    location.reload();
+                } catch {
+                    alert('الملف غير صالح');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
 
-document.getElementById('clear-confirm').onclick = () => {
-    ALL_DATA_KEYS.forEach(k => localStorage.removeItem(k));
-    document.getElementById('clear-modal').style.display = 'none';
-    location.reload();
-};
+        function drawerClear() {
+            closeDrawer();
+            document.getElementById('clear-modal').style.display = 'flex';
+        }
 
-</script>
+        document.getElementById('clear-cancel').onclick = () => {
+            document.getElementById('clear-modal').style.display = 'none';
+        };
+
+        document.getElementById('clear-confirm').onclick = () => {
+            DATA_KEYS.forEach(k => localStorage.removeItem(k));
+            document.getElementById('clear-modal').style.display = 'none';
+            location.reload();
+        };
+    </script>
 </body>
 </html>
