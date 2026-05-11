@@ -1,8 +1,8 @@
 {
-    "name": "حاسبة فاتورة الكهرباء",
-    "short_name": "حاسبة الكهرباء",
-    "description": "حاسبة بسيطة لتقدير قيمة فاتورة الكهرباء الشهرية في الأردن.",
-    "id": "/electric-bill-calculator/",
+    "name": "حاسبة الكهرباء والماء",
+    "short_name": "حاسبة الكهرباء والماء",
+    "description": "حاسبة بسيطة لتقدير قيمة فاتورة الكهرباء والماء في الأردن.",
+    "id": "/bill-calculator/",
     "start_url": "./index.html",
     "scope": ".",
     "display": "standalone",
