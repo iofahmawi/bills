@@ -395,11 +395,11 @@
                 <div class="readings-container">
                     <div class="reading-input">
                         <label for="w-previous-reading">القراءة السابقة</label>
-                        <input type="number" id="w-previous-reading" class="w-hide-kb">
+                        <input type="number" id="w-previous-reading" class="w-hide-kb" step="1" min="0">
                     </div>
                     <div class="reading-input">
                         <label for="w-current-reading">القراءة الحالية</label>
-                        <input type="number" id="w-current-reading" class="w-hide-kb">
+                        <input type="number" id="w-current-reading" class="w-hide-kb" step="1" min="0">
                     </div>
                 </div>
                 <div class="extra-inputs">
@@ -786,9 +786,9 @@ function calculateWaterBill() {
         return false;
     }
 
-    const currentReading  = parseFloat(currentReadingValue);
-    const hasPrevious     = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
-    const previousReading = hasPrevious ? parseFloat(previousReadingValue) : 0;
+    const currentReading  = parseInt(currentReadingValue, 10);
+    const hasPrevious     = (previousReadingValue !== '' && parseInt(previousReadingValue, 10) >= 0);
+    const previousReading = hasPrevious ? parseInt(previousReadingValue, 10) : 0;
 
     if (hasPrevious && currentReading < previousReading) {
         showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-الماء');
@@ -851,7 +851,7 @@ function calculateWaterBill() {
             let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
             const endDateOfCycle = new Date(y, m + 1, d);
             const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
-            const predictedCons = parseFloat((dailyAvgRaw * totalCycleDays).toFixed(2));
+            const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
             const predictedBill = getFullWaterCost(predictedCons, isSewerService);
             const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> م³ <strong>${water_fmt(predictedBill)}</strong> دينار</div>`;
             avgDivHtml = `<div class="daily-avg-container avg-warning">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> م³${predictionHtml}</div>`;
