@@ -853,8 +853,8 @@ function calculateWaterBill() {
             const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
             const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
             const predictedBill = getFullWaterCost(predictedCons, isSewerService);
-            const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> متر <strong>${water_fmt(predictedBill)}</strong> دينار</div>`;
-            avgDivHtml = `<div class="daily-avg-container avg-warning">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> متر${predictionHtml}</div>`;
+            const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> متر مكعب <strong>${water_fmt(predictedBill)}</strong> دينار</div>`;
+            avgDivHtml = `<div class="daily-avg-container avg-warning">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> متر مكعب${predictionHtml}</div>`;
         }
     }
 
@@ -863,7 +863,7 @@ function calculateWaterBill() {
             <h2 style="color:var(--secondary-green);font-size:1.1rem;font-weight:700;">${isSewerService ? 'مخدوم بالصرف الصحي' : 'غير مخدوم بالصرف'}</h2>
         </div>
         ${avgDivHtml}
-        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">تفاصيل استهلاك ${formatNumber(consumption)} متر:</span></div>
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">تفاصيل استهلاك ${formatNumber(consumption)} متر مكعب:</span></div>
         <div class="table-container">
             <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
             <tbody>${tableRowsHtml}</tbody></table>
