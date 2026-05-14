@@ -388,7 +388,7 @@
         </div>
     </div>
 
-    <!-- ===== قسم الماء ===== -->
+    <!-- ===== قسم المياه ===== -->
     <div id="section-water" style="display:none">
         <div class="card">
             <div class="input-group">
@@ -734,7 +734,7 @@ function calculateElectricBill() {
 }
 
 // =============================================
-// حاسبة الماء
+// حاسبة المياه
 // =============================================
 
 document.querySelectorAll('.w-hide-kb').forEach(input => {
@@ -782,7 +782,7 @@ function calculateWaterBill() {
     const previousReadingValue = previousReadingInput.value.trim();
 
     if (currentReadingValue === '') {
-        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-الماء');
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-المياه');
         return false;
     }
 
@@ -791,7 +791,7 @@ function calculateWaterBill() {
     const previousReading = hasPrevious ? parseInt(previousReadingValue, 10) : 0;
 
     if (hasPrevious && currentReading < previousReading) {
-        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-الماء');
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-المياه');
         return false;
     }
 
@@ -868,13 +868,13 @@ function calculateWaterBill() {
             <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
             <tbody>${tableRowsHtml}</tbody></table>
         </div>
-        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي الماء:</span><span class="result-value">${water_fmt(waterTotal)}</span></span></div>
+        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي المياه:</span><span class="result-value">${water_fmt(waterTotal)}</span></span></div>
         <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي الصرف:</span><span class="result-value">${water_fmt(sewerTotal)}</span></span></div>
         <hr>
         <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${water_fmt(finalTotal)}</span></div>
     `;
 
-    showModal(html, 'فاتورة-الماء');
+    showModal(html, 'فاتورة-المياه');
     return true;
 }
 
