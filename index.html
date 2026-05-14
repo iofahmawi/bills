@@ -626,7 +626,7 @@ function calculateElectricBill() {
 
     const currentReadingValue  = currentReadingInput.value.trim();
     const previousReadingValue = previousReadingInput.value.trim();
-    const readingDayValue      = (readingDayInput.dataset.value || readingDayInput.value).trim();
+    const readingDayValue      = readingDayInput.value.trim() ? (readingDayInput.dataset.value || readingDayInput.value).trim() : '';
     const wasteFeeValue        = wasteInput.value.trim() === "" ? 3 : parseFloat(wasteInput.value);
     const phaseValue           = parseInt(phaseInput.value);
 
@@ -834,7 +834,8 @@ function calculateWaterBill() {
     const finalTotal = waterTotal + sewerTotal;
 
     let avgDivHtml = "";
-    const readingDayValue = (document.getElementById('w-reading-day').dataset.value || document.getElementById('w-reading-day').value).trim();
+    const wDayInput = document.getElementById('w-reading-day');
+    const readingDayValue = wDayInput.value.trim() ? (wDayInput.dataset.value || wDayInput.value).trim() : '';
     if (hasPrevious && readingDayValue !== "") {
         const dateParts = readingDayValue.split("-");
         if (dateParts.length === 3) {
