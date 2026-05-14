@@ -2,7 +2,7 @@
     "name": "حاسبة الكهرباء والماء",
     "short_name": "حاسبة الفواتير",
     "description": "حاسبة بسيطة لتقدير قيمة فاتورة الكهرباء والماء في الأردن.",
-    "id": "/bill-calculator/",
+    "id": "/bills-calculator/",
     "start_url": "./index.html",
     "scope": ".",
     "display": "standalone",
