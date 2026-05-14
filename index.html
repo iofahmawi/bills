@@ -723,8 +723,8 @@ function calculateElectricBill() {
             <table><thead><tr><th>تلفزيون</th><th>نفايات</th><th>عداد</th><th>فلس الريف</th></tr></thead>
             <tbody><tr><td>${elec_fmt(tvFee)}</td><td>${elec_fmt(wasteFee)}</td><td>${elec_fmt(meterFee)}</td><td>${elec_fmt(ruralFilss)}</td></tr></tbody></table>
         </div>
-        <div class="result-row" style="margin-top:20px;"><span class="result-text-value"><span class="result-label">الإجمالي قبل الدعم:</span><span class="result-value">${elec_fmt(totalBillBeforeSupport)}</span></span></div>
-        <div class="result-row"><span class="result-text-value"><span class="result-label">قيمة الدعم الحكومي:</span><span class="result-value">${elec_fmt(governmentSupport)}</span></span></div>
+        <div class="result-row" style="margin-top:15px;"><span class="result-text-value"><span class="result-label">الإجمالي قبل الدعم:</span><span class="result-value">${elec_fmt(totalBillBeforeSupport)}</span></span></div>
+        <div class="result-row" style="margin-bottom:15px;"><span class="result-text-value"><span class="result-label">قيمة الدعم الحكومي:</span><span class="result-value">${elec_fmt(governmentSupport)}</span></span></div>
         <hr>
         <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${elec_fmt(finalTotal)}</span></div>
     `;
