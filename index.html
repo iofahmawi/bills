@@ -990,7 +990,7 @@ function drawerExport() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     const now = new Date();
-    a.download = `bill ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}.json`;
+    a.download = `bills ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}.json`;
     a.click();
     closeDrawer();
 }
