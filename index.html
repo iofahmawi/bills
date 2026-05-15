@@ -235,20 +235,6 @@
         th, td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; text-align: center; }
         th { background-color: #f8fafc; color: var(--primary); font-weight: 700; }
 
-        /* ===== Daily avg (electricity only) ===== */
-        .daily-avg-container {
-            text-align: right;
-            font-size: 0.9rem;
-            padding: 12px;
-            line-height: 1.6;
-            border-radius: 12px;
-            margin: 20px 0;
-            box-sizing: border-box;
-            border: 1px solid transparent;
-        }
-        .avg-warning { background-color: #f8fafc; color: var(--text-main); border-color: #e2e8f0; }
-        .avg-danger  { background-color: #f8fafc; color: var(--text-main); border-color: #e2e8f0; }
-        .daily-avg-container strong { color: var(--primary); }
         
 
         /* ===== Footer ===== */
@@ -669,13 +655,19 @@ function calculateElectricBill() {
             const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
             const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
             const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
-            if (subscriptionType === 'supported') {
-                trafficClass = predictedCons > 600 ? "avg-danger" : "avg-warning";
-            } else {
-                trafficClass = predictedCons > 1000 ? "avg-danger" : "avg-warning";
-            }
-            const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> كيلوواط <strong>${formatNumber(predictedBill.toFixed(2))}</strong> دينار</div>`;
-            avgDivHtml = `<div class="daily-avg-container ${trafficClass}">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> كيلوواط${predictionHtml}</div>`;
+            const monthlyRateElec = formatNumber((dailyAvgRaw * 30).toFixed(1));
+            avgDivHtml = `
+<div class="table-container" style="margin:20px 0 0;">
+    <table>
+        <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
+        <tbody><tr>
+            <td>${roundedDays}</td>
+            <td>${dailyAvg}</td>
+            <td>${monthlyRateElec}</td>
+            <td>${formatNumber(predictedBill.toFixed(2))}</td>
+        </tr></tbody>
+    </table>
+</div>`;
         }
     }
 
@@ -856,8 +848,19 @@ function calculateWaterBill() {
             const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
             const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
             const predictedBill = getFullWaterCost(predictedCons, isSewerService);
-            const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> متر <strong>${water_fmt(predictedBill)}</strong> دينار</div>`;
-            avgDivHtml = `<div class="daily-avg-container avg-warning">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> متر${predictionHtml}</div>`;
+            const monthlyRateWater = formatNumber((dailyAvgRaw * 30).toFixed(2));
+            avgDivHtml = `
+<div class="table-container" style="margin:20px 0 0;">
+    <table>
+        <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
+        <tbody><tr>
+            <td>${roundedDays}</td>
+            <td>${dailyAvg}</td>
+            <td>${monthlyRateWater}</td>
+            <td>${water_fmt(predictedBill)}</td>
+        </tr></tbody>
+    </table>
+</div>`;
         }
     }
 
