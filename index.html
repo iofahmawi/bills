@@ -249,6 +249,7 @@
         .avg-warning { background-color: #f8fafc; color: var(--text-main); border-color: #e2e8f0; }
         .avg-danger  { background-color: #f8fafc; color: var(--text-main); border-color: #e2e8f0; }
         .daily-avg-container strong { color: var(--primary); }
+        
 
         /* ===== Footer ===== */
         .simple-footer {
@@ -673,7 +674,7 @@ function calculateElectricBill() {
             } else {
                 trafficClass = predictedCons > 1000 ? "avg-danger" : "avg-warning";
             }
-            const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> كيلوواط <strong>${elec_fmt(predictedBill)}</strong> دينار</div>`;
+            const predictionHtml = `<div style="margin-top:5.5px;">الفاتورة المتوقعة لاستهلاك <strong>${formatNumber(predictedCons)}</strong> كيلوواط <strong>${formatNumber(predictedBill.toFixed(2))}</strong> دينار</div>`;
             avgDivHtml = `<div class="daily-avg-container ${trafficClass}">معدل الاستهلاك اليومي خلال ${dayLabel} <strong>${dailyAvg}</strong> كيلوواط${predictionHtml}</div>`;
         }
     }
