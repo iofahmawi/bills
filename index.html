@@ -53,7 +53,67 @@
             width: 92%;
             max-width: 450px;
             margin: 20px auto 0;
+            position: relative;
         }
+        .header-menu-btn {
+            position: absolute;
+            left: 10px;
+            top: 14px;
+            background: none;
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .dropdown-menu {
+            position: absolute;
+            left: 10px;
+            top: 52px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 155px;
+            overflow: hidden;
+            display: none;
+        }
+        .dropdown-menu.open { display: block; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 14px;
+            background: none;
+            border: none;
+            border-bottom: none;
+            width: 100%;
+            text-align: right;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: var(--text-main);
+            font-family: inherit;
+            direction: rtl;
+        }
+        .dropdown-item:active { background: var(--bg-light); }
+        .dropdown-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .dropdown-item-icon.blue  { background: var(--primary-light); color: var(--primary); }
+        .dropdown-item-icon.green { background: #d1fae5; color: #059669; }
+        .dropdown-item-icon.red   { background: #fee2e2; color: var(--error-red); }
+        .dropdown-item + .dropdown-item { border-top: 1px solid #f1f5f9; }
 
         @media (display-mode: standalone), (display-mode: fullscreen) {
             .header-card {
@@ -246,56 +306,6 @@
         }
         .simple-footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
 
-        /* ===== Swipe Drawer ===== */
-        #swipe-drawer-overlay {
-            position: fixed; inset: 0;
-            background: rgba(15,23,42,0.5);
-            z-index: 2000;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(0px);
-        }
-        #swipe-drawer-overlay.open { opacity: 1; pointer-events: all; }
-
-        #swipe-drawer {
-            position: fixed;
-            top: 15px; left: 0; bottom: 15px;
-            width: 205px; height: auto;
-            background: var(--primary);
-            z-index: 2001;
-            transform: translateX(-100%);
-            transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
-            display: flex; flex-direction: column;
-            box-shadow: 8px 0 32px rgba(0,0,0,0.12);
-            border-top-right-radius: 14px;
-            border-bottom-right-radius: 14px;
-            overflow: hidden;
-        }
-        #swipe-drawer.open { transform: translateX(0); }
-
-        .drawer-header { background: var(--primary); padding: 28px 20px 22px; color: var(--white); }
-        .drawer-header h3 { font-size: 1.05rem; font-weight: 700; margin: 0; }
-        .drawer-items { flex: 1; padding: 16px 0; background: var(--white); }
-        .drawer-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px 20px;
-            cursor: pointer; border: none; background: none;
-            width: 100%; text-align: right;
-            font-size: 0.95rem; font-weight: 600;
-            color: var(--text-main);
-            transition: background 0.15s;
-            direction: rtl;
-        }
-        .drawer-item:active { background: var(--bg-light); }
-        .drawer-item-icon {
-            width: 38px; height: 38px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .drawer-item-icon.blue  { background: var(--primary-light); color: var(--primary); }
-        .drawer-item-icon.green { background: #d1fae5; color: #059669; }
-        .drawer-item-icon.red   { background: #fee2e2; color: var(--error-red); }
-        .drawer-divider { height: 1px; background: rgba(0,0,0,0.04); margin: 2px 16px; }
         #drawer-import-input { display: none; }
     </style>
 </head>
@@ -305,6 +315,21 @@
 
     <!-- Header Card -->
     <div class="header-card">
+        <button class="header-menu-btn" onclick="toggleDropdown()">⋮</button>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <button class="dropdown-item" onclick="drawerImport(); closeDropdown()">
+                <div class="dropdown-item-icon blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                استيراد
+            </button>
+            <button class="dropdown-item" onclick="drawerExport(); closeDropdown()">
+                <div class="dropdown-item-icon green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                تصدير
+            </button>
+            <button class="dropdown-item" onclick="drawerClear(); closeDropdown()">
+                <div class="dropdown-item-icon red"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+                مسح البيانات
+            </button>
+        </div>
         <h2 class="app-title">حاسبة الفواتير</h2>
         <div class="tab-bar">
             <button class="tab-btn active" id="tab-elec" onclick="switchToTab('elec')">
@@ -430,29 +455,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-<!-- القائمة الجانبية (الكهرباء فقط) -->
-<div id="swipe-drawer-overlay" onclick="closeDrawer()"></div>
-<div id="swipe-drawer">
-    <div class="drawer-header"><h3>الإعدادات</h3></div>
-    <div class="drawer-items">
-        <button class="drawer-item" onclick="drawerImport()">
-            <div class="drawer-item-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-            <span>استيراد من ملف</span>
-        </button>
-        <div class="drawer-divider"></div>
-        <button class="drawer-item" onclick="drawerExport()">
-            <div class="drawer-item-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-            <span>تصدير إلى ملف</span>
-        </button>
-        <div class="drawer-divider"></div>
-        <button class="drawer-item" onclick="drawerClear()">
-            <div class="drawer-item-icon red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
-            <span>مسح البيانات</span>
-        </button>
-    </div>
-</div>
 <input type="file" id="drawer-import-input" accept=".json" onchange="drawerImportFile(event)">
-<div id="swipe-edge-handle" style="position:fixed;top:0;left:0;width:28px;height:100%;z-index:1999;touch-action:none;"></div>
 
 <!-- نافذة تأكيد المسح -->
 <div id="clear-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
@@ -936,42 +939,24 @@ if ('serviceWorker' in navigator) {
 }
 
 // =============================================
-// القائمة الجانبية (الكهرباء)
+// القائمة المنسدلة
 // =============================================
-const drawer        = document.getElementById('swipe-drawer');
-const drawerOverlay = document.getElementById('swipe-drawer-overlay');
-const edgeHandle    = document.getElementById('swipe-edge-handle');
-let drawerIsOpen = false;
-let sX = 0, sY = 0;
+const dropdownMenu = document.getElementById('dropdown-menu');
 
-function openDrawer()  { drawerIsOpen = true;  drawer.classList.add('open');    drawerOverlay.classList.add('open');    }
-function closeDrawer() { drawerIsOpen = false; drawer.classList.remove('open'); drawerOverlay.classList.remove('open'); }
+function toggleDropdown() {
+    dropdownMenu.classList.toggle('open');
+}
+function closeDropdown() {
+    dropdownMenu.classList.remove('open');
+}
 
-edgeHandle.addEventListener('touchstart', e => {
-    e.preventDefault();
-    sX = e.touches[0].clientX;
-    sY = e.touches[0].clientY;
-}, { passive: false });
+document.addEventListener('click', e => {
+    if (!dropdownMenu.contains(e.target) && !e.target.closest('.header-menu-btn')) {
+        closeDropdown();
+    }
+});
 
-edgeHandle.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - sX;
-    const dy = e.changedTouches[0].clientY - sY;
-    if (Math.abs(dx) > Math.abs(dy) && dx > 40) openDrawer();
-}, { passive: true });
-
-document.addEventListener('touchstart', e => {
-    sX = e.touches[0].clientX;
-    sY = e.touches[0].clientY;
-}, { passive: true });
-
-document.addEventListener('touchend', e => {
-    if (!drawerIsOpen) return;
-    const dx = e.changedTouches[0].clientX - sX;
-    const dy = e.changedTouches[0].clientY - sY;
-    if (Math.abs(dx) > Math.abs(dy) && dx < -40) closeDrawer();
-}, { passive: true });
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDropdown(); });
 
 // =============================================
 // تصدير / استيراد / مسح (الكهرباء)
@@ -997,7 +982,7 @@ function drawerExport() {
     const now = new Date();
     a.download = `bills ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}.json`;
     a.click();
-    closeDrawer();
+    
 }
 
 function drawerImport() {
@@ -1012,7 +997,7 @@ function drawerImportFile(e) {
         try {
             const data = JSON.parse(ev.target.result);
             ALL_DATA_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem(k, data[k]); });
-            closeDrawer();
+            
             location.reload();
         } catch {
             alert('الملف غير صالح');
@@ -1023,7 +1008,7 @@ function drawerImportFile(e) {
 }
 
 function drawerClear() {
-    closeDrawer();
+    
     document.getElementById('clear-modal').style.display = 'flex';
 }
 
