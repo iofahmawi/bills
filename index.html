@@ -370,7 +370,7 @@
             </div>
 
             <div class="radio-group">
-                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع العداد</label>
+                <label style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع العداد</label>
                 <div class="radio-options">
                     <div class="radio-option">
                         <input type="radio" id="e-phase-1" name="e-meter-phase" value="1" checked>
@@ -384,7 +384,7 @@
             </div>
 
             <div class="radio-group">
-                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع الاشتراك</label>
+                <label style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع الاشتراك</label>
                 <div class="radio-options">
                     <div class="radio-option">
                         <input type="radio" id="e-sub-supported" name="e-subscription-type" value="supported" checked>
@@ -424,7 +424,7 @@
             </div>
 
             <div class="radio-group">
-                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">مخدوم بالصرف الصحي</label>
+                <label style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">مخدوم بالصرف الصحي</label>
                 <div class="radio-options">
                     <div class="radio-option">
                         <input type="radio" id="w-sewer-yes" name="w-sewer-service" value="yes" checked>
@@ -464,10 +464,10 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
         </div>
         <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">مسح البيانات</p>
-        <p style="font-size:0.94rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">سيتم حذف جميع البيانات المحفوظة بشكل نهائي</p>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">سيتم حذف جميع البيانات المحفوظة بشكل نهائي</p>
         <div style="display:flex;gap:10px;">
-            <button id="clear-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
-            <button id="clear-confirm" style="flex:1;height:42px;border:none;background:var(--error-red);border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">مسح</button>
+            <button id="clear-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.9rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+            <button id="clear-confirm" style="flex:1;height:42px;border:none;background:var(--error-red);border-radius:12px;font-size:0.9rem;font-weight:700;color:white;cursor:pointer;">مسح</button>
         </div>
     </div>
 </div>
@@ -710,12 +710,12 @@ function calculateElectricBill() {
             <h2 style="color:var(--secondary-green);margin:0 auto;font-size:1.1rem;font-weight:700;width:fit-content;display:inline-block;">${resultTitle}</h2>
         </div>
         ${avgDivHtml}
-        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">كلفة الاستهلاك الحالي ${formatNumber(consumption)} كيلوواط:</span></div>
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">كلفة الاستهلاك الحالي ${formatNumber(consumption)} كيلوواط:</span></div>
         <div class="table-container">
             <table><thead><tr><th>الشريحة</th><th>الاستهلاك</th><th>التعرفة</th><th>الإجمالي</th></tr></thead>
             <tbody>${tableRowsHtml}</tbody></table>
         </div>
-        <div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">رسوم إضافية:</span></div>
+        <div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">رسوم إضافية:</span></div>
         <div class="table-container" style="margin-bottom:5px;">
             <table><thead><tr><th>تلفزيون</th><th>نفايات</th><th>عداد</th><th>فلس الريف</th></tr></thead>
             <tbody><tr><td>${elec_fmt(tvFee)}</td><td>${elec_fmt(wasteFee)}</td><td>${elec_fmt(meterFee)}</td><td>${elec_fmt(ruralFilss)}</td></tr></tbody></table>
@@ -872,7 +872,7 @@ function calculateWaterBill() {
             <h2 style="color:var(--secondary-green);font-size:1.1rem;font-weight:700;">${isSewerService ? 'مخدوم بالصرف الصحي' : 'غير مخدوم بالصرف'}</h2>
         </div>
         ${avgDivHtml}
-        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">تفاصيل استهلاك ${formatNumber(consumption)} متر:</span></div>
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;">تفاصيل استهلاك ${formatNumber(consumption)} متر:</span></div>
         <div class="table-container">
             <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
             <tbody>${tableRowsHtml}</tbody></table>
