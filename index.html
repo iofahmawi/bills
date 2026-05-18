@@ -652,7 +652,7 @@ function calculateElectricBill() {
             const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
             const monthlyRateElec = formatNumber((dailyAvgRaw * 30).toFixed(1));
             avgDivHtml = `
-<div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">ملخص الاستهلاك خلال ${roundedDays} يوم:</span></div>
+<div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">معدل الاستهلاك خلال ${roundedDays} يوم:</span></div>
 <div class="table-container" style="margin:0 0 0;">
     <table>
         <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
@@ -703,7 +703,7 @@ function calculateElectricBill() {
             <h2 style="color:var(--secondary-green);margin:0 auto;font-size:1.1rem;font-weight:700;width:fit-content;display:inline-block;">${resultTitle}</h2>
         </div>
         ${avgDivHtml}
-        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">تفاصيل استهلاك ${formatNumber(consumption)} كيلوواط:</span></div>
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">الاستهلاك الحالي ${formatNumber(consumption)} كيلوواط:</span></div>
         <div class="table-container" style="">
             <table><thead><tr><th>الشريحة</th><th>الاستهلاك</th><th>التعرفة</th><th>الإجمالي</th></tr></thead>
             <tbody>${tableRowsHtml}</tbody></table>
@@ -827,7 +827,7 @@ function calculateWaterBill() {
         <div style="width:100%;text-align:center;">
             <h2 style="color:var(--secondary-green);font-size:1.1rem;font-weight:700;">${isSewerService ? 'مخدوم بالصرف الصحي' : 'غير مخدوم بالصرف'}</h2>
         </div>
-        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">تفاصيل استهلاك ${formatNumber(consumption)} متر:</span></div>
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">الاستهلاك الحالي ${formatNumber(consumption)} متر:</span></div>
         <div class="table-container">
             <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
             <tbody>${tableRowsHtml}</tbody></table>
