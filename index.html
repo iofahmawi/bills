@@ -660,6 +660,7 @@ function calculateElectricBill() {
             const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
             const monthlyRateElec = formatNumber((dailyAvgRaw * 30).toFixed(1));
             avgDivHtml = `
+<div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">ملخص الاستهلاك خلال ${roundedDays} يوم:</span></div>
 <div class="table-container" style="margin:0 0 0;">
     <table>
         <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
@@ -853,6 +854,7 @@ function calculateWaterBill() {
             const predictedBill = getFullWaterCost(predictedCons, isSewerService);
             const monthlyRateWater = formatNumber((dailyAvgRaw * 30).toFixed(2));
         avgDivHtml = `
+<div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">ملخص الاستهلاك خلال ${roundedDays} يوم:</span></div>
 <div class="table-container" style="margin:0 0 0;">
     <table>
         <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
