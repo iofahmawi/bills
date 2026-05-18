@@ -644,7 +644,7 @@ function calculateElectricBill() {
             const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
             const dailyAvg = formatNumber(dailyAvgRaw);
             const roundedDays = Math.floor(diffDays);
-            let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
+            let dayLabel = (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
             let trafficClass = "avg-warning";
             const endDateOfCycle = new Date(y, m + 1, d);
             const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
