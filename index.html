@@ -203,7 +203,7 @@
             background: var(--white);
         }
 
-        #e-reading-day, #w-reading-day { direction: rtl; text-align: center; }
+        #e-reading-day { direction: rtl; text-align: center; }
 
         /* ===== Radio ===== */
         .radio-group { margin: 15px 0; }
@@ -415,12 +415,7 @@
                         <input type="number" id="w-current-reading" class="w-hide-kb" step="1" min="0">
                     </div>
                 </div>
-                <div class="extra-inputs">
-                    <div style="flex:1;">
-                        <label>تاريخ الفاتورة السابقة</label>
-                        <input type="text" id="w-reading-day" placeholder="" inputmode="numeric" pattern="\d*" class="w-hide-kb" autocomplete="off" spellcheck="false">
-                    </div>
-                </div>
+
             </div>
 
             <div class="radio-group">
@@ -567,9 +562,6 @@ document.getElementById('e-reading-day').addEventListener('blur', function() {
     convertToYMD(this);
 });
 
-document.getElementById('w-reading-day').addEventListener('blur', function() {
-    convertToYMD(this);
-});
 
 function getFullCost(cons, subType, waste, phase) {
     let energyCost = 0;
@@ -660,7 +652,7 @@ function calculateElectricBill() {
             const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
             const monthlyRateElec = formatNumber((dailyAvgRaw * 30).toFixed(1));
             avgDivHtml = `
-<div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">ملخص الاستهلاك خلال ${roundedDays} يوم:</span></div>
+<div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">ملخص الاستهلاك خلال ${roundedDays} يوم:</span></div>
 <div class="table-container" style="margin:0 0 0;">
     <table>
         <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
@@ -707,12 +699,12 @@ function calculateElectricBill() {
     const resultTitle = subscriptionType === 'supported' ? 'اشتراك مدعوم' : 'اشتراك غير مدعوم';
 
     const html = `
-        <div style="width:100%;text-align:center;margin-bottom:20px;display:block;">
+        <div style="width:100%;text-align:center;display:block;">
             <h2 style="color:var(--secondary-green);margin:0 auto;font-size:1.1rem;font-weight:700;width:fit-content;display:inline-block;">${resultTitle}</h2>
         </div>
         ${avgDivHtml}
         <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">تفاصيل استهلاك ${formatNumber(consumption)} كيلوواط:</span></div>
-        <div class="table-container">
+        <div class="table-container" style="">
             <table><thead><tr><th>الشريحة</th><th>الاستهلاك</th><th>التعرفة</th><th>الإجمالي</th></tr></thead>
             <tbody>${tableRowsHtml}</tbody></table>
         </div>
@@ -746,7 +738,6 @@ function water_runCalculation() {
         localStorage.setItem('water_currentReading', document.getElementById('w-current-reading').value);
         localStorage.setItem('water_previousReading', document.getElementById('w-previous-reading').value);
         localStorage.setItem('water_sewerService', document.querySelector('input[name="w-sewer-service"]:checked').value);
-        localStorage.setItem('water_day', document.getElementById('w-reading-day').dataset.value || document.getElementById('w-reading-day').value);
     }
 }
 
@@ -831,49 +822,11 @@ function calculateWaterBill() {
 
     const finalTotal = waterTotal + sewerTotal;
 
-    let avgDivHtml = "";
-    const wDayInput = document.getElementById('w-reading-day');
-    const readingDayValue = wDayInput.value.trim() ? (wDayInput.dataset.value || wDayInput.value).trim() : '';
-    if (hasPrevious && readingDayValue !== "") {
-        const dateParts = readingDayValue.split("-");
-        if (dateParts.length === 3) {
-            const y = parseInt(dateParts[0], 10);
-            const m = parseInt(dateParts[1], 10) - 1;
-            const d = parseInt(dateParts[2], 10);
-            const startDate = new Date(y, m, d, 9, 0, 0, 0);
-            const now = new Date();
-            const diffHours = (now - startDate) / (1000 * 60 * 60);
-            let diffDays = diffHours > 0 ? diffHours / 24 : 1;
-            const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
-            const dailyAvg = formatNumber(dailyAvgRaw);
-            const roundedDays = Math.floor(diffDays);
-            let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
-            const endDateOfCycle = new Date(y, m + 1, d);
-            const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
-            const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
-            const predictedBill = getFullWaterCost(predictedCons, isSewerService);
-            const monthlyRateWater = formatNumber((dailyAvgRaw * 30).toFixed(2));
-        avgDivHtml = `
-<div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">ملخص الاستهلاك خلال ${roundedDays} يوم:</span></div>
-<div class="table-container" style="margin:0 0 0;">
-    <table>
-        <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
-        <tbody><tr>
-            <td>${roundedDays}</td>
-            <td>${dailyAvg}</td>
-            <td>${monthlyRateWater}</td>
-            <td>${water_fmt(predictedBill)}</td>
-        </tr></tbody>
-    </table>
-</div>`;
-        }
-    }
 
     const html = `
-        <div style="width:100%;text-align:center;margin-bottom:20px;">
+        <div style="width:100%;text-align:center;">
             <h2 style="color:var(--secondary-green);font-size:1.1rem;font-weight:700;">${isSewerService ? 'مخدوم بالصرف الصحي' : 'غير مخدوم بالصرف'}</h2>
         </div>
-        ${avgDivHtml}
         <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">تفاصيل استهلاك ${formatNumber(consumption)} متر:</span></div>
         <div class="table-container">
             <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
@@ -919,11 +872,6 @@ window.onload = () => {
     if (savedWaterCurrent) {
         document.getElementById('w-current-reading').value  = savedWaterCurrent;
         document.getElementById('w-previous-reading').value = localStorage.getItem('water_previousReading');
-        const savedWaterDay = localStorage.getItem('water_day') || '';
-        if (savedWaterDay) {
-            document.getElementById('w-reading-day').value = savedWaterDay;
-            convertToYMD(document.getElementById('w-reading-day'));
-        }
         const savedSewer = localStorage.getItem('water_sewerService');
         if (savedSewer) document.getElementById(savedSewer === 'yes' ? 'w-sewer-yes' : 'w-sewer-no').checked = true;
     }
