@@ -1,51 +1,977 @@
-// sw.js
-const CACHE_NAME = 'e-bill-dynamic-v127';
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>حاسبة الفواتير</title>
+    <meta name="theme-color" content="#f8fafc">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-1024.png">
+    <link rel="apple-touch-icon" href="icon-1024.png">
 
-const urlsToCache = [
-  './',
-  'index.html',
-  'manifest.json'
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --secondary-green: #10b981;
+            --white: #ffffff;
+            --bg-light: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --error-red: #ef4444;
+            --radius: 16px;
+            --shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+            --standard-height: 42px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        html, body { height: 100%; background-color: var(--bg-light); }
+
+        body {
+            direction: rtl;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-main);
+        }
+
+        .content-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
+
+        /* ===== Header Card ===== */
+        .header-card {
+            background: var(--primary);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px -2px rgba(37,99,235,0.18);
+            padding: 19px 20px 9px;
+            width: 92%;
+            max-width: 450px;
+            margin: 20px auto 0;
+            position: relative;
+        }
+        .header-menu-btn {
+            position: absolute;
+            left: 10px;
+            top: 14px;
+            background: none;
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .dropdown-menu {
+            position: absolute;
+            left: 10px;
+            top: 52px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 155px;
+            overflow: hidden;
+            display: none;
+        }
+        .dropdown-menu.open { display: block; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 14px;
+            background: none;
+            border: none;
+            border-bottom: none;
+            width: 100%;
+            text-align: right;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: var(--text-main);
+            font-family: inherit;
+            direction: rtl;
+        }
+        .dropdown-item:active { background: var(--bg-light); }
+        .dropdown-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .dropdown-item-icon.blue  { background: var(--primary-light); color: var(--primary); }
+        .dropdown-item-icon.green { background: #d1fae5; color: #059669; }
+        .dropdown-item-icon.red   { background: #fee2e2; color: var(--error-red); }
+        .dropdown-item + .dropdown-item { border-top: 1px solid #f1f5f9; }
+
+        @media (display-mode: standalone), (display-mode: fullscreen) {
+            .header-card {
+                padding-top: 21px;
+                padding-bottom: 11px;
+            }
+        }
+
+        .app-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            height: 44px;
+            align-items: center;
+        }
+
+        .tab-btn {
+            flex: 1;
+            height: 100%;
+            border: none;
+            background: transparent;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.55);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .tab-btn.active {
+            color: var(--white);
+            font-size: 1rem;
+        }
+
+        /* ===== Card ===== */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            width: 92%;
+            max-width: 450px;
+            margin: 17px auto 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        .readings-container, .extra-inputs { display: flex; gap: 12px; margin-bottom: 15px; }
+        .reading-input, .waste-input-wrapper { flex: 1; }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            padding-right: 4px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: var(--standard-height);
+            padding: 6px 10px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+            background: #fdfdfd;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: var(--white);
+        }
+
+        #e-reading-day { direction: rtl; text-align: center; }
+
+        /* ===== Radio ===== */
+        .radio-group { margin: 15px 0; }
+        .radio-options {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 5px;
+            height: var(--standard-height);
+            align-items: center;
+        }
+
+        .radio-option { flex: 1; position: relative; height: 100%; }
+        .radio-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+        .radio-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            margin-bottom: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* ===== Button ===== */
+        .calculate-btn {
+            width: 100%;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            height: var(--standard-height);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        .calculate-btn:active { transform: scale(0.98); }
+
+        /* ===== Modal ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.8);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000; padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            width: 100%; max-width: 450px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            cursor: pointer;
+        }
+        #modal-results-content { padding: 25px 15px; }
+
+        /* ===== Result styles ===== */
+        .result-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0; font-size: 0.95rem; }
+        .result-text-value { display: inline-flex; gap: 12px; align-items: baseline; }
+        .result-label { color: var(--text-main); font-weight: 500; }
+        .result-value { color: var(--text-main); font-weight: 700; }
+        hr { border: none; border-top: 1px solid #e4e9ee; margin: 15px 10px; }
+        .final-total-section { text-align: center; margin-top: 10px; }
+        .final-total-section p { font-size: 1rem; color: var(--text-main); margin: 0; }
+        .final-total-section span { font-size: 1.55rem; font-weight: 800; color: var(--secondary-green); display: block; margin-top: 7px; line-height: 1; }
+        .table-container { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 15px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; text-align: center; line-height: 1.2; }
+        th { background-color: #f8fafc; color: var(--primary); font-weight: 700; }
+
+        
+
+        /* ===== Footer ===== */
+        .simple-footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding: 20px 0 calc(15px + env(safe-area-inset-bottom, 0px));
+        }
+        .simple-footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
+
+        #drawer-import-input { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="content-wrapper">
+
+    <!-- Header Card -->
+    <div class="header-card">
+        <button class="header-menu-btn" onclick="toggleDropdown()">⋮</button>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <button class="dropdown-item" onclick="drawerImport(); closeDropdown()">
+                <div class="dropdown-item-icon blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                استيراد البيانات
+            </button>
+            <button class="dropdown-item" onclick="drawerExport(); closeDropdown()">
+                <div class="dropdown-item-icon green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                تصدير البيانات
+            </button>
+            <button class="dropdown-item" onclick="drawerClear(); closeDropdown()">
+                <div class="dropdown-item-icon red"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+                مسح البيانات
+            </button>
+        </div>
+        <h2 class="app-title">حاسبة الفواتير</h2>
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tab-elec" onclick="switchToTab('elec')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                الكهرباء
+            </button>
+            <button class="tab-btn" id="tab-water" onclick="switchToTab('water')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 4 10 4 15a8 8 0 0 0 16 0c0-5-8-13-8-13z"/></svg>
+                المياه
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== قسم الكهرباء ===== -->
+    <div id="section-elec">
+        <div class="card">
+            <div class="input-group">
+                <div class="readings-container">
+                    <div class="reading-input">
+                        <label for="e-previous-reading">القراءة السابقة</label>
+                        <input type="number" id="e-previous-reading" class="e-enter-next">
+                    </div>
+                    <div class="reading-input">
+                        <label for="e-current-reading">القراءة الحالية</label>
+                        <input type="number" id="e-current-reading" class="e-enter-next">
+                    </div>
+                </div>
+                <div class="extra-inputs">
+                    <div style="flex:1;">
+                        <label>تاريخ الفاتورة السابقة</label>
+                        <input type="text" id="e-reading-day" placeholder="" inputmode="numeric" pattern="\d*" class="e-enter-next" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div class="waste-input-wrapper">
+                        <label for="e-waste-fee">رسوم النفايات</label>
+                        <input type="number" id="e-waste-fee" value="3" class="e-enter-next">
+                    </div>
+                </div>
+            </div>
+
+            <div class="radio-group">
+                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع العداد</label>
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="e-phase-1" name="e-meter-phase" value="1" checked>
+                        <label for="e-phase-1"><span style="transform:translateY(2px);display:inline-block">1 فاز</span></label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="e-phase-3" name="e-meter-phase" value="3">
+                        <label for="e-phase-3"><span style="transform:translateY(2px);display:inline-block">3 فاز</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="radio-group">
+                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع الاشتراك</label>
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="e-sub-supported" name="e-subscription-type" value="supported" checked>
+                        <label for="e-sub-supported">مدعوم</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="e-sub-unsupported" name="e-subscription-type" value="unsupported">
+                        <label for="e-sub-unsupported">غير مدعوم</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="calculate-btn" onclick="elec_calculateAndSave()">احسب القيمة</button>
+        </div>
+    </div>
+
+    <!-- ===== قسم المياه ===== -->
+    <div id="section-water" style="display:none">
+        <div class="card">
+            <div class="input-group">
+                <div class="readings-container">
+                    <div class="reading-input">
+                        <label for="w-previous-reading">القراءة السابقة</label>
+                        <input type="number" id="w-previous-reading" class="w-hide-kb" step="1" min="0">
+                    </div>
+                    <div class="reading-input">
+                        <label for="w-current-reading">القراءة الحالية</label>
+                        <input type="number" id="w-current-reading" class="w-hide-kb" step="1" min="0">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="radio-group">
+                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">مخدوم بالصرف الصحي</label>
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="w-sewer-yes" name="w-sewer-service" value="yes" checked>
+                        <label for="w-sewer-yes">نعم</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="w-sewer-no" name="w-sewer-service" value="no">
+                        <label for="w-sewer-no">لا</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="calculate-btn" onclick="water_runCalculation()">احسب القيمة</button>
+        </div>
+    </div>
+
+</div><!-- end content-wrapper -->
+
+<div id="result-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div id="modal-results-content"></div>
+    </div>
+</div>
+
+<footer class="simple-footer">
+    طوّر بواسطة <a href="https://github.com/iofahmawi" target="_blank" rel="noopener noreferrer">iofahmawi</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<input type="file" id="drawer-import-input" accept=".json" onchange="drawerImportFile(event)">
+
+<!-- نافذة تأكيد المسح -->
+<div id="clear-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+    <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
+        <div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </div>
+        <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">مسح البيانات</p>
+        <p style="font-size:0.94rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">سيتم حذف جميع البيانات المحفوظة بشكل نهائي</p>
+        <div style="display:flex;gap:10px;">
+            <button id="clear-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+            <button id="clear-confirm" style="flex:1;height:42px;border:none;background:var(--error-red);border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">مسح</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+// =============================================
+// التبديل بين الحاسبتين
+// =============================================
+let activeCalc = 'elec';
+
+function switchToTab(tab) {
+    activeCalc = tab;
+    document.getElementById('section-elec').style.display  = tab === 'elec'  ? 'block' : 'none';
+    document.getElementById('section-water').style.display = tab === 'water' ? 'block' : 'none';
+    document.getElementById('tab-elec').classList.toggle('active',  tab === 'elec');
+    document.getElementById('tab-water').classList.toggle('active', tab === 'water');
+}
+
+// للتوافق مع أي استدعاء قديم
+function switchCalc() { switchToTab(activeCalc === 'elec' ? 'water' : 'elec'); }
+
+// =============================================
+// مشترك
+// =============================================
+function formatNumber(num) { return parseFloat(num).toString(); }
+function elec_fmt(num)  { return formatNumber(num.toFixed(3)); }
+function water_fmt(num) { return formatNumber(num.toFixed(2)); }
+
+function showModal(html, downloadName) {
+    const modal = document.getElementById('result-modal');
+    const modalContentDiv = document.getElementById('modal-results-content');
+    modalContentDiv.innerHTML = html;
+    modal.style.display = 'flex';
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.querySelector('.modal-content').ondblclick = (event) => {
+        event.stopPropagation();
+        const el = document.querySelector('.modal-content');
+        const prevMaxHeight = el.style.maxHeight;
+        const prevOverflow = el.style.overflowY;
+        el.style.maxHeight = 'none';
+        el.style.overflowY = 'visible';
+        html2canvas(el, { scale: window.devicePixelRatio * 3, useCORS: true }).then(canvas => {
+            el.style.maxHeight = prevMaxHeight;
+            el.style.overflowY = prevOverflow;
+            const link = document.createElement('a');
+            const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+            link.download = `${downloadName}-${today}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    };
+}
+
+// =============================================
+// حاسبة الكهرباء
+// =============================================
+
+// ترتيب الحقول للانتقال بـ Enter
+const elec_fieldIds = ['e-current-reading', 'e-previous-reading', 'e-reading-day', 'e-waste-fee'];
+document.querySelectorAll('.e-enter-next').forEach(input => {
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const idx = elec_fieldIds.indexOf(this.id);
+            if (idx !== -1 && idx < elec_fieldIds.length - 1) {
+                document.getElementById(elec_fieldIds[idx + 1]).focus();
+            } else {
+                this.blur();
+            }
+        }
+    });
+});
+
+function convertToYMD(input) {
+    let val = input.value.trim().replace(/\s+/g, '');
+    if (!val) return;
+    let day, month, year, m;
+    const ddmmyyyy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/;
+    const yyyymmdd = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+    if ((m = val.match(ddmmyyyy))) {
+        day = m[1].padStart(2, '0');
+        month = m[2].padStart(2, '0');
+        year = m[3];
+    } else if ((m = val.match(yyyymmdd))) {
+        year = m[1];
+        month = m[2].padStart(2, '0');
+        day = m[3].padStart(2, '0');
+    } else {
+        return;
+    }
+    input.dataset.value = `${year}-${month}-${day}`;
+    input.value = `${year}-${month}-${day}`;
+}
+
+document.getElementById('e-reading-day').addEventListener('blur', function() {
+    convertToYMD(this);
+});
+
+
+function getFullCost(cons, subType, waste, phase) {
+    let energyCost = 0;
+    let remaining = cons;
+    let tariffs = subType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
+    let acc = 0;
+    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
+        const [limit, price] = tariffs[i];
+        const size = (limit === Infinity) ? Infinity : (limit - acc);
+        const used = Math.min(remaining, size);
+        energyCost += used * price;
+        remaining -= used;
+        acc += used;
+    }
+    let support = 0;
+    if (subType === 'supported') {
+        if (cons >= 51 && cons <= 200) support = 2.5;
+        else if (cons >= 201 && cons <= 600) support = 2.0;
+    }
+    let meterFee = (phase == 3) ? 0.50 : 0.20;
+    const fixedFees = waste + 1.0 + meterFee + (cons / 1000);
+    return (energyCost + fixedFees) - support;
+}
+
+function elec_calculateAndSave() {
+    if (document.activeElement) document.activeElement.blur();
+    const success = calculateElectricBill();
+    if (success) {
+        localStorage.setItem('calculator_currentReading', document.getElementById('e-current-reading').value);
+        localStorage.setItem('calculator_previousReading', document.getElementById('e-previous-reading').value);
+        localStorage.setItem('calculator_day', document.getElementById('e-reading-day').dataset.value || document.getElementById('e-reading-day').value);
+        localStorage.setItem('calculator_waste', document.getElementById('e-waste-fee').value);
+        localStorage.setItem('calculator_phase', document.querySelector('input[name="e-meter-phase"]:checked').value);
+        localStorage.setItem('calculator_subscriptionType', document.querySelector('input[name="e-subscription-type"]:checked').value);
+    }
+}
+
+function calculateElectricBill() {
+    const currentReadingInput    = document.getElementById('e-current-reading');
+    const previousReadingInput   = document.getElementById('e-previous-reading');
+    const readingDayInput        = document.getElementById('e-reading-day');
+    const wasteInput             = document.getElementById('e-waste-fee');
+    const phaseInput             = document.querySelector('input[name="e-meter-phase"]:checked');
+    const subscriptionTypeInput  = document.querySelector('input[name="e-subscription-type"]:checked');
+
+    const currentReadingValue  = currentReadingInput.value.trim();
+    const previousReadingValue = previousReadingInput.value.trim();
+    const readingDayValue      = readingDayInput.value.trim() ? (readingDayInput.dataset.value || readingDayInput.value).trim() : '';
+    const wasteFeeValue        = wasteInput.value.trim() === "" ? 3 : parseFloat(wasteInput.value);
+    const phaseValue           = parseInt(phaseInput.value);
+
+    if (currentReadingValue === '') {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>', 'فاتورة-الكهرباء');
+        return false;
+    }
+
+    const currentReading  = parseFloat(currentReadingValue);
+    const hasPrevious     = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
+    const previousReading = hasPrevious ? parseFloat(previousReadingValue) : 0;
+    const consumption     = currentReading - previousReading;
+    const subscriptionType = subscriptionTypeInput.value;
+
+    if (consumption < 0) {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>', 'فاتورة-الكهرباء');
+        return false;
+    }
+
+    let avgDivHtml = "";
+    if (hasPrevious && readingDayValue !== "") {
+        const dateParts = readingDayValue.split("-");
+        if (dateParts.length === 3) {
+            const y = parseInt(dateParts[0], 10);
+            const m = parseInt(dateParts[1], 10) - 1;
+            const d = parseInt(dateParts[2], 10);
+            const startDate = new Date(y, m, d, 9, 0, 0, 0);
+            const now = new Date();
+            const diffMs = now - startDate;
+            const diffHours = diffMs / (1000 * 60 * 60);
+            let diffDays = diffHours > 0 ? diffHours / 24 : 1;
+            const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
+            const dailyAvg = formatNumber(dailyAvgRaw);
+            const roundedDays = Math.floor(diffDays);
+            let dayLabel = (roundedDays === 1) ? "يوم واحد" : (roundedDays === 2) ? "يومين" : (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
+            let trafficClass = "avg-warning";
+            const endDateOfCycle = new Date(y, m + 1, d);
+            const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
+            const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
+            const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
+            const monthlyRateElec = formatNumber((dailyAvgRaw * 30).toFixed(1));
+            avgDivHtml = `
+<div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">معدل الاستهلاك خلال ${roundedDays} يوم:</span></div>
+<div class="table-container" style="margin:0 0 0;">
+    <table>
+        <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
+        <tbody><tr>
+            <td>${roundedDays}</td>
+            <td>${dailyAvg}</td>
+            <td>${monthlyRateElec}</td>
+            <td>${formatNumber(predictedBill.toFixed(2))}</td>
+        </tr></tbody>
+    </table>
+</div>`;
+        }
+    }
+
+    let totalEnergyCost = 0.0;
+    let tableRowsHtml = '';
+    let remaining = consumption;
+    let tariffs = subscriptionType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
+    let acc_cons = 0;
+    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
+        const [limit, price] = tariffs[i];
+        const start = acc_cons + 1;
+        const end = limit === Infinity ? Infinity : limit;
+        const size = end - acc_cons;
+        const used = Math.min(remaining, size);
+        const cost = parseFloat((used * price).toFixed(5));
+        totalEnergyCost += cost;
+        remaining -= used;
+        acc_cons += used;
+        let label = limit === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
+        if (used > 0) {
+            tableRowsHtml += `<tr><td>${label}</td><td>${formatNumber(used)}</td><td>${elec_fmt(price)}</td><td>${elec_fmt(cost)}</td></tr>`;
+        }
+    }
+
+    let governmentSupport = 0.0;
+    if (subscriptionType === 'supported') {
+        if (consumption >= 51 && consumption <= 200) governmentSupport = 2.5;
+        else if (consumption >= 201 && consumption <= 600) governmentSupport = 2.0;
+    }
+    const wasteFee = wasteFeeValue, tvFee = 1.0, meterFee = (phaseValue == 3 ? 0.50 : 0.20), ruralFilss = consumption / 1000;
+    const totalBillBeforeSupport = totalEnergyCost + wasteFee + tvFee + meterFee + ruralFilss;
+    const finalTotal = totalBillBeforeSupport - governmentSupport;
+    const resultTitle = subscriptionType === 'supported' ? 'اشتراك مدعوم' : 'اشتراك غير مدعوم';
+
+    const html = `
+        <div style="width:100%;text-align:center;display:block;">
+            <h2 style="color:var(--secondary-green);margin:0 auto;font-size:1.1rem;font-weight:700;width:fit-content;display:inline-block;">${resultTitle}</h2>
+        </div>
+        ${avgDivHtml}
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">الاستهلاك الحالي ${formatNumber(consumption)} كيلوواط:</span></div>
+        <div class="table-container" style="">
+            <table><thead><tr><th>الشريحة</th><th>الاستهلاك</th><th>التعرفة</th><th>الإجمالي</th></tr></thead>
+            <tbody>${tableRowsHtml}</tbody></table>
+        </div>
+        <div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">رسوم إضافية:</span></div>
+        <div class="table-container" style="margin-bottom:5px;">
+            <table><thead><tr><th>تلفزيون</th><th>نفايات</th><th>عداد</th><th>فلس الريف</th></tr></thead>
+            <tbody><tr><td>${elec_fmt(tvFee)}</td><td>${elec_fmt(wasteFee)}</td><td>${elec_fmt(meterFee)}</td><td>${elec_fmt(ruralFilss)}</td></tr></tbody></table>
+        </div>
+        <div class="result-row" style="margin-top:15px;"><span class="result-text-value"><span class="result-label">الإجمالي قبل الدعم:</span><span class="result-value">${elec_fmt(totalBillBeforeSupport)}</span></span></div>
+        <div class="result-row" style="margin-bottom:15px;"><span class="result-text-value"><span class="result-label">قيمة الدعم الحكومي:</span><span class="result-value">${elec_fmt(governmentSupport)}</span></span></div>
+        <hr>
+        <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${elec_fmt(finalTotal)}</span></div>
+    `;
+
+    showModal(html, 'فاتورة-الكهرباء');
+    return true;
+}
+
+// =============================================
+// حاسبة المياه
+// =============================================
+
+document.querySelectorAll('.w-hide-kb').forEach(input => {
+    input.addEventListener('keypress', function(e) { if (e.key === 'Enter') { this.blur(); } });
+});
+
+function water_runCalculation() {
+    if (document.activeElement) document.activeElement.blur();
+    const success = calculateWaterBill();
+    if (success) {
+        localStorage.setItem('water_currentReading', document.getElementById('w-current-reading').value);
+        localStorage.setItem('water_previousReading', document.getElementById('w-previous-reading').value);
+        localStorage.setItem('water_sewerService', document.querySelector('input[name="w-sewer-service"]:checked').value);
+    }
+}
+
+function getFullWaterCost(cons, isSewerService) {
+    const wT = [ [6, 0.60], [6, 0.80], [6, 1.10], [6, 1.40], [12, 1.80] ];
+    const sT = [ [6, 0.15], [6, 0.50], [6, 0.70], [6, 0.85], [12, 0.95] ];
+    let wTotal = 0.0, sTotal = 0.0;
+    if (cons <= 6) {
+        wTotal = 2.50; sTotal = isSewerService ? 0.23 : 0.0;
+    } else {
+        wTotal = 2.50; sTotal = isSewerService ? 0.23 : 0.0;
+        let rem = cons - 6;
+        for (let i = 0; i < wT.length; i++) {
+            if (rem <= 0) break;
+            const used = Math.min(rem, wT[i][0]);
+            wTotal += used * wT[i][1];
+            if (isSewerService) sTotal += used * sT[i][1];
+            rem -= used;
+        }
+        if (rem > 0) { wTotal += rem * 2.20; if (isSewerService) sTotal += rem * 1.20; }
+    }
+    return wTotal + sTotal;
+}
+
+function calculateWaterBill() {
+    const currentReadingInput  = document.getElementById('w-current-reading');
+    const previousReadingInput = document.getElementById('w-previous-reading');
+    const isSewerService       = document.getElementById('w-sewer-yes').checked;
+
+    const currentReadingValue  = currentReadingInput.value.trim();
+    const previousReadingValue = previousReadingInput.value.trim();
+
+    if (currentReadingValue === '') {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-المياه');
+        return false;
+    }
+
+    const currentReading  = parseInt(currentReadingValue, 10);
+    const hasPrevious     = (previousReadingValue !== '' && parseInt(previousReadingValue, 10) >= 0);
+    const previousReading = hasPrevious ? parseInt(previousReadingValue, 10) : 0;
+
+    if (hasPrevious && currentReading < previousReading) {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-المياه');
+        return false;
+    }
+
+    const consumption = currentReading - previousReading;
+    const waterTariffs = [ [6, 0.60], [6, 0.80], [6, 1.10], [6, 1.40], [12, 1.80] ];
+    const sewerTariffs = [ [6, 0.15], [6, 0.50], [6, 0.70], [6, 0.85], [12, 0.95] ];
+    const sliceNames   = [ "7 - 12", "13 - 18", "19 - 24", "25 - 30", "31 - 42", "43 فما فوق" ];
+
+    let waterTotal = 0.0, sewerTotal = 0.0, tableRowsHtml = '';
+
+    if (consumption <= 6) {
+        waterTotal = 2.50;
+        sewerTotal = isSewerService ? 0.23 : 0.0;
+        tableRowsHtml = `<tr><td>0 - 6</td><td>${formatNumber(consumption)}</td><td>2.50</td><td>${isSewerService ? '0.23' : '0'}</td></tr>`;
+    } else {
+        waterTotal = 2.50;
+        sewerTotal = isSewerService ? 0.23 : 0.0;
+        tableRowsHtml = `<tr><td>0 - 6</td><td>6</td><td>2.50</td><td>${isSewerService ? '0.23' : '0'}</td></tr>`;
+
+        let remaining = consumption - 6;
+        for (let i = 0; i < waterTariffs.length; i++) {
+            if (remaining <= 0) break;
+            const [blockSize, waterPrice] = waterTariffs[i];
+            const [_, sewerPrice] = sewerTariffs[i];
+            const used = Math.min(remaining, blockSize);
+            waterTotal += used * waterPrice;
+            if (isSewerService) sewerTotal += used * sewerPrice;
+            remaining -= used;
+            tableRowsHtml += `<tr><td>${sliceNames[i]}</td><td>${formatNumber(used)}</td><td>${water_fmt(waterPrice)}</td><td>${isSewerService ? water_fmt(sewerPrice) : '0'}</td></tr>`;
+        }
+
+        if (remaining > 0) {
+            const waterPrice = 2.20, sewerPrice = 1.20;
+            waterTotal += remaining * waterPrice;
+            if (isSewerService) sewerTotal += remaining * sewerPrice;
+            tableRowsHtml += `<tr><td>${sliceNames[5]}</td><td>${formatNumber(remaining)}</td><td>${water_fmt(waterPrice)}</td><td>${isSewerService ? water_fmt(sewerPrice) : '0'}</td></tr>`;
+        }
+    }
+
+    const finalTotal = waterTotal + sewerTotal;
+
+
+    const html = `
+        <div style="width:100%;text-align:center;">
+            <h2 style="color:var(--secondary-green);font-size:1.1rem;font-weight:700;">${isSewerService ? 'مخدوم بالصرف الصحي' : 'غير مخدوم بالصرف'}</h2>
+        </div>
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">الاستهلاك الحالي ${formatNumber(consumption)} متر:</span></div>
+        <div class="table-container">
+            <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
+            <tbody>${tableRowsHtml}</tbody></table>
+        </div>
+        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي المياه:</span><span class="result-value">${water_fmt(waterTotal)}</span></span></div>
+        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي الصرف:</span><span class="result-value">${water_fmt(sewerTotal)}</span></span></div>
+        <hr>
+        <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${water_fmt(finalTotal)}</span></div>
+    `;
+
+    showModal(html, 'فاتورة-المياه');
+    return true;
+}
+
+// =============================================
+// window.onload — تحميل البيانات المحفوظة
+// =============================================
+window.onload = () => {
+    // الكهرباء
+    if (localStorage.getItem('calculator_currentReading')) {
+        document.getElementById('e-current-reading').value  = localStorage.getItem('calculator_currentReading');
+        document.getElementById('e-previous-reading').value = localStorage.getItem('calculator_previousReading');
+        const savedDay = localStorage.getItem('calculator_day') || '';
+        if (savedDay) {
+            document.getElementById('e-reading-day').value = savedDay;
+            convertToYMD(document.getElementById('e-reading-day'));
+        }
+        document.getElementById('e-waste-fee').value = localStorage.getItem('calculator_waste') || '3';
+        const savedPhase = localStorage.getItem('calculator_phase');
+        if (savedPhase) {
+            const phaseRadio = document.getElementById(`e-phase-${savedPhase}`);
+            if (phaseRadio) phaseRadio.checked = true;
+        }
+        const savedSub = localStorage.getItem('calculator_subscriptionType');
+        if (savedSub) {
+            const radio = document.getElementById(`e-sub-${savedSub}`);
+            if (radio) radio.checked = true;
+        }
+    }
+    // الماء
+    const savedWaterCurrent = localStorage.getItem('water_currentReading');
+    if (savedWaterCurrent) {
+        document.getElementById('w-current-reading').value  = savedWaterCurrent;
+        document.getElementById('w-previous-reading').value = localStorage.getItem('water_previousReading');
+        const savedSewer = localStorage.getItem('water_sewerService');
+        if (savedSewer) document.getElementById(savedSewer === 'yes' ? 'w-sewer-yes' : 'w-sewer-no').checked = true;
+    }
+};
+
+// =============================================
+// Service Worker
+// =============================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('SW Registered'))
+            .catch(err => console.log('SW Failed', err));
+    });
+}
+
+// =============================================
+// القائمة المنسدلة
+// =============================================
+const dropdownMenu = document.getElementById('dropdown-menu');
+
+function toggleDropdown() {
+    dropdownMenu.classList.toggle('open');
+}
+function closeDropdown() {
+    dropdownMenu.classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+    if (!dropdownMenu.contains(e.target) && !e.target.closest('.header-menu-btn')) {
+        closeDropdown();
+    }
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDropdown(); });
+
+// =============================================
+// تصدير / استيراد / مسح (الكهرباء)
+// =============================================
+const ALL_DATA_KEYS = [
+    'calculator_currentReading',
+    'calculator_previousReading',
+    'calculator_day',
+    'calculator_waste',
+    'calculator_phase',
+    'calculator_subscriptionType',
+    'water_currentReading',
+    'water_previousReading',
+    'water_sewerService'
 ];
 
-self.addEventListener('install', event => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
-});
+function drawerExport() {
+    const data = {};
+    ALL_DATA_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) data[k] = v; });
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const now = new Date();
+    a.download = `bills ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}.json`;
+    a.click();
+    
+}
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames =>
-      Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
-      )
-    ).then(() => self.clients.claim())
-  );
-});
+function drawerImport() {
+    document.getElementById('drawer-import-input').click();
+}
 
-self.addEventListener('fetch', event => {
-  // Network First: دائماً نحاول الشبكة أولاً، والكاش فقط عند انقطاع الإنترنت
-  event.respondWith(
-    fetch(event.request)
-      .then(networkResponse => {
-        // إذا نجح الطلب، نحدّث الكاش ونرجع الاستجابة الجديدة
-        if (
-          networkResponse &&
-          networkResponse.status === 200 &&
-          event.request.method === 'GET' &&
-          !event.request.url.startsWith('chrome-extension')
-        ) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
+function drawerImportFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            const data = JSON.parse(ev.target.result);
+            ALL_DATA_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem(k, data[k]); });
+            
+            location.reload();
+        } catch {
+            alert('الملف غير صالح');
         }
-        return networkResponse;
-      })
-      .catch(() => {
-        // إذا انقطع الإنترنت، نرجع النسخة المخزنة
-        return caches.match(event.request);
-      })
-  );
-});
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+}
+
+function drawerClear() {
+    
+    document.getElementById('clear-modal').style.display = 'flex';
+}
+
+document.getElementById('clear-cancel').onclick = () => {
+    document.getElementById('clear-modal').style.display = 'none';
+};
+
+document.getElementById('clear-confirm').onclick = () => {
+    ALL_DATA_KEYS.forEach(k => localStorage.removeItem(k));
+    document.getElementById('clear-modal').style.display = 'none';
+    location.reload();
+};
+
+</script>
+</body>
+</html>
