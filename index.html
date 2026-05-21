@@ -851,25 +851,28 @@ function calculateWaterBill() {
 // =============================================
 window.onload = () => {
     // الكهرباء
-    if (localStorage.getItem('calculator_currentReading')) {
-        document.getElementById('e-current-reading').value  = localStorage.getItem('calculator_currentReading');
-        document.getElementById('e-previous-reading').value = localStorage.getItem('calculator_previousReading');
-        const savedDay = localStorage.getItem('calculator_day') || '';
-        if (savedDay) {
-            document.getElementById('e-reading-day').value = savedDay;
-            convertToYMD(document.getElementById('e-reading-day'));
-        }
-        document.getElementById('e-waste-fee').value = localStorage.getItem('calculator_waste') || '3';
-        const savedPhase = localStorage.getItem('calculator_phase');
-        if (savedPhase) {
-            const phaseRadio = document.getElementById(`e-phase-${savedPhase}`);
-            if (phaseRadio) phaseRadio.checked = true;
-        }
-        const savedSub = localStorage.getItem('calculator_subscriptionType');
-        if (savedSub) {
-            const radio = document.getElementById(`e-sub-${savedSub}`);
-            if (radio) radio.checked = true;
-        }
+    const savedCurrent = localStorage.getItem('calculator_currentReading');
+    if (savedCurrent) document.getElementById('e-current-reading').value = savedCurrent;
+
+    const savedPrevious = localStorage.getItem('calculator_previousReading');
+    if (savedPrevious) document.getElementById('e-previous-reading').value = savedPrevious;
+
+    const savedDay = localStorage.getItem('calculator_day') || '';
+    if (savedDay) {
+        document.getElementById('e-reading-day').value = savedDay;
+        convertToYMD(document.getElementById('e-reading-day'));
+    }
+    document.getElementById('e-waste-fee').value = localStorage.getItem('calculator_waste') || '3';
+
+    const savedPhase = localStorage.getItem('calculator_phase');
+    if (savedPhase) {
+        const phaseRadio = document.getElementById(`e-phase-${savedPhase}`);
+        if (phaseRadio) phaseRadio.checked = true;
+    }
+    const savedSub = localStorage.getItem('calculator_subscriptionType');
+    if (savedSub) {
+        const radio = document.getElementById(`e-sub-${savedSub}`);
+        if (radio) radio.checked = true;
     }
     // الماء
     const savedWaterCurrent = localStorage.getItem('water_currentReading');
