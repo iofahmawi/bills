@@ -850,6 +850,13 @@ function calculateWaterBill() {
 // window.onload — تحميل البيانات المحفوظة
 // =============================================
 window.onload = () => {
+    // استعادة التبويب النشط بعد إعادة التحميل
+    const savedTab = sessionStorage.getItem('activeTab');
+    if (savedTab) {
+        sessionStorage.removeItem('activeTab');
+        switchToTab(savedTab);
+    }
+
     // الكهرباء
     const savedCurrent = localStorage.getItem('calculator_currentReading');
     if (savedCurrent) document.getElementById('e-current-reading').value = savedCurrent;
@@ -874,14 +881,16 @@ window.onload = () => {
         const radio = document.getElementById(`e-sub-${savedSub}`);
         if (radio) radio.checked = true;
     }
-    // الماء
+
+    // الماء — يُحمَّل كل حقل باستقلالية
     const savedWaterCurrent = localStorage.getItem('water_currentReading');
-    if (savedWaterCurrent) {
-        document.getElementById('w-current-reading').value  = savedWaterCurrent;
-        document.getElementById('w-previous-reading').value = localStorage.getItem('water_previousReading');
-        const savedSewer = localStorage.getItem('water_sewerService');
-        if (savedSewer) document.getElementById(savedSewer === 'yes' ? 'w-sewer-yes' : 'w-sewer-no').checked = true;
-    }
+    if (savedWaterCurrent) document.getElementById('w-current-reading').value = savedWaterCurrent;
+
+    const savedWaterPrevious = localStorage.getItem('water_previousReading');
+    if (savedWaterPrevious) document.getElementById('w-previous-reading').value = savedWaterPrevious;
+
+    const savedSewer = localStorage.getItem('water_sewerService');
+    if (savedSewer) document.getElementById(savedSewer === 'yes' ? 'w-sewer-yes' : 'w-sewer-no').checked = true;
 };
 
 // =============================================
@@ -899,20 +908,39 @@ if ('serviceWorker' in navigator) {
 // ترحيل الدورة
 // =============================================
 function rolloverCycle() {
-    const currentReading = localStorage.getItem('calculator_currentReading');
-    if (!currentReading) {
-        alert('لا توجد قراءة حالية محفوظة للترحيل.');
-        return;
-    }
-    const today = new Date();
-    const yy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${yy}-${mm}-${dd}`;
+    if (activeCalc === 'water') {
+        const currentReading = localStorage.getItem('water_currentReading');
+        if (!currentReading) {
+            alert('لا توجد قراءة مياه حالية محفوظة للترحيل.');
+            return;
+        }
+        localStorage.setItem('water_previousReading', currentReading);
+        localStorage.removeItem('water_currentReading');
+    } else {
+        const currentReading = localStorage.getItem('calculator_currentReading');
+        if (!currentReading) {
+            alert('لا توجد قراءة كهرباء حالية محفوظة للترحيل.');
+            return;
+        }
+        localStorage.setItem('calculator_previousReading', currentReading);
+        localStorage.removeItem('calculator_currentReading');
 
-    localStorage.setItem('calculator_previousReading', currentReading);
-    localStorage.setItem('calculator_currentReading', '');
-    localStorage.setItem('calculator_day', todayStr);
+        // تقديم تاريخ الفاتورة شهراً واحداً
+        const savedDay = localStorage.getItem('calculator_day');
+        if (savedDay) {
+            const parts = savedDay.split('-');
+            if (parts.length === 3) {
+                // new Date(y, m, d) — الشهر 0-indexed، فنمرر m كما هو (بدون -1) للحصول على الشهر التالي
+                const next = new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+                const ny = next.getFullYear();
+                const nm = String(next.getMonth() + 1).padStart(2, '0');
+                const nd = String(next.getDate()).padStart(2, '0');
+                localStorage.setItem('calculator_day', `${ny}-${nm}-${nd}`);
+            }
+        }
+    }
+
+    sessionStorage.setItem('activeTab', activeCalc);
     location.reload();
 }
 
