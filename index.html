@@ -474,6 +474,36 @@
 <script>
 
 // =============================================
+// أسعار افتراضية (fallback إذا لم يوجد prices.json)
+// =============================================
+let PRICES = {
+    elec: {
+        supported:   [[300, 0.05], [600, 0.10], [999999, 0.20]],
+        unsupported: [[1000, 0.12], [999999, 0.15]],
+        support:     [[51, 200, 2.5], [201, 600, 2.0]],
+        tv: 1.0, meter1: 0.20, meter3: 0.50
+    },
+    water: {
+        tariffs:   [[6, 0.60, 0.15], [6, 0.80, 0.50], [6, 1.10, 0.70], [6, 1.40, 0.85], [12, 1.80, 0.95]],
+        base: 2.50, baseSewer: 0.23,
+        overflow: [2.20, 1.20]
+    }
+};
+
+async function loadPrices() {
+    try {
+        const res = await fetch('prices.json?v=' + Date.now());
+        if (!res.ok) return;
+        const data = await res.json();
+        const year = new Date().getFullYear().toString();
+        const found = data[year] || data[Object.keys(data).sort().pop()];
+        if (found) PRICES = found;
+    } catch(e) {
+        console.warn('prices.json غير موجود، يُستخدم الأسعار الافتراضية');
+    }
+}
+
+// =============================================
 // التبديل بين الحاسبتين
 // =============================================
 let activeCalc = 'elec';
@@ -568,13 +598,11 @@ document.getElementById('e-reading-day').addEventListener('blur', function() {
 
 
 function getFullCost(cons, subType, waste, phase) {
-    let energyCost = 0;
-    let remaining = cons;
-    let tariffs = subType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
-    let acc = 0;
+    let energyCost = 0, remaining = cons, acc = 0;
+    const tariffs = subType === 'supported' ? PRICES.elec.supported : PRICES.elec.unsupported;
     for (let i = 0; i < tariffs.length && remaining > 0; i++) {
         const [limit, price] = tariffs[i];
-        const size = (limit === Infinity) ? Infinity : (limit - acc);
+        const size = limit >= 999999 ? Infinity : (limit - acc);
         const used = Math.min(remaining, size);
         energyCost += used * price;
         remaining -= used;
@@ -582,11 +610,12 @@ function getFullCost(cons, subType, waste, phase) {
     }
     let support = 0;
     if (subType === 'supported') {
-        if (cons >= 51 && cons <= 200) support = 2.5;
-        else if (cons >= 201 && cons <= 600) support = 2.0;
+        for (const [from, to, val] of PRICES.elec.support) {
+            if (cons >= from && cons <= to) { support = val; break; }
+        }
     }
-    let meterFee = (phase == 3) ? 0.50 : 0.20;
-    const fixedFees = waste + 1.0 + meterFee + (cons / 1000);
+    const meterFee = (phase == 3) ? PRICES.elec.meter3 : PRICES.elec.meter1;
+    const fixedFees = waste + PRICES.elec.tv + meterFee + (cons / 1000);
     return (energyCost + fixedFees) - support;
 }
 
@@ -674,19 +703,19 @@ function calculateElectricBill() {
     let totalEnergyCost = 0.0;
     let tableRowsHtml = '';
     let remaining = consumption;
-    let tariffs = subscriptionType === 'supported' ? [[300, 0.05], [600, 0.10], [Infinity, 0.20]] : [[1000, 0.12], [Infinity, 0.15]];
+    let tariffs = subscriptionType === 'supported' ? PRICES.elec.supported : PRICES.elec.unsupported;
     let acc_cons = 0;
     for (let i = 0; i < tariffs.length && remaining > 0; i++) {
         const [limit, price] = tariffs[i];
         const start = acc_cons + 1;
-        const end = limit === Infinity ? Infinity : limit;
-        const size = end - acc_cons;
+        const end = limit >= 999999 ? Infinity : limit;
+        const size = end === Infinity ? Infinity : (end - acc_cons);
         const used = Math.min(remaining, size);
         const cost = parseFloat((used * price).toFixed(5));
         totalEnergyCost += cost;
         remaining -= used;
         acc_cons += used;
-        let label = limit === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
+        let label = end === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
         if (used > 0) {
             tableRowsHtml += `<tr><td>${label}</td><td>${formatNumber(used)}</td><td>${elec_fmt(price)}</td><td>${elec_fmt(cost)}</td></tr>`;
         }
@@ -694,10 +723,11 @@ function calculateElectricBill() {
 
     let governmentSupport = 0.0;
     if (subscriptionType === 'supported') {
-        if (consumption >= 51 && consumption <= 200) governmentSupport = 2.5;
-        else if (consumption >= 201 && consumption <= 600) governmentSupport = 2.0;
+        for (const [from, to, val] of PRICES.elec.support) {
+            if (consumption >= from && consumption <= to) { governmentSupport = val; break; }
+        }
     }
-    const wasteFee = wasteFeeValue, tvFee = 1.0, meterFee = (phaseValue == 3 ? 0.50 : 0.20), ruralFilss = consumption / 1000;
+    const wasteFee = wasteFeeValue, tvFee = PRICES.elec.tv, meterFee = (phaseValue == 3 ? PRICES.elec.meter3 : PRICES.elec.meter1), ruralFilss = consumption / 1000;
     const totalBillBeforeSupport = totalEnergyCost + wasteFee + tvFee + meterFee + ruralFilss;
     const finalTotal = totalBillBeforeSupport - governmentSupport;
     const resultTitle = subscriptionType === 'supported' ? 'اشتراك مدعوم' : 'اشتراك غير مدعوم';
@@ -746,22 +776,19 @@ function water_runCalculation() {
 }
 
 function getFullWaterCost(cons, isSewerService) {
-    const wT = [ [6, 0.60], [6, 0.80], [6, 1.10], [6, 1.40], [12, 1.80] ];
-    const sT = [ [6, 0.15], [6, 0.50], [6, 0.70], [6, 0.85], [12, 0.95] ];
-    let wTotal = 0.0, sTotal = 0.0;
-    if (cons <= 6) {
-        wTotal = 2.50; sTotal = isSewerService ? 0.23 : 0.0;
-    } else {
-        wTotal = 2.50; sTotal = isSewerService ? 0.23 : 0.0;
+    const { tariffs, base, baseSewer, overflow } = PRICES.water;
+    let wTotal = base, sTotal = isSewerService ? baseSewer : 0.0;
+    if (cons > 6) {
         let rem = cons - 6;
-        for (let i = 0; i < wT.length; i++) {
+        for (let i = 0; i < tariffs.length; i++) {
             if (rem <= 0) break;
-            const used = Math.min(rem, wT[i][0]);
-            wTotal += used * wT[i][1];
-            if (isSewerService) sTotal += used * sT[i][1];
+            const [size, wp, sp] = tariffs[i];
+            const used = Math.min(rem, size);
+            wTotal += used * wp;
+            if (isSewerService) sTotal += used * sp;
             rem -= used;
         }
-        if (rem > 0) { wTotal += rem * 2.20; if (isSewerService) sTotal += rem * 1.20; }
+        if (rem > 0) { wTotal += rem * overflow[0]; if (isSewerService) sTotal += rem * overflow[1]; }
     }
     return wTotal + sTotal;
 }
@@ -789,26 +816,24 @@ function calculateWaterBill() {
     }
 
     const consumption = currentReading - previousReading;
-    const waterTariffs = [ [6, 0.60], [6, 0.80], [6, 1.10], [6, 1.40], [12, 1.80] ];
-    const sewerTariffs = [ [6, 0.15], [6, 0.50], [6, 0.70], [6, 0.85], [12, 0.95] ];
-    const sliceNames   = [ "7 - 12", "13 - 18", "19 - 24", "25 - 30", "31 - 42", "43 فما فوق" ];
+    const { tariffs: waterTariffs, base, baseSewer, overflow } = PRICES.water;
+    const sliceNames = [ "7 - 12", "13 - 18", "19 - 24", "25 - 30", "31 - 42", "43 فما فوق" ];
 
     let waterTotal = 0.0, sewerTotal = 0.0, tableRowsHtml = '';
 
     if (consumption <= 6) {
-        waterTotal = 2.50;
-        sewerTotal = isSewerService ? 0.23 : 0.0;
-        tableRowsHtml = `<tr><td>0 - 6</td><td>${formatNumber(consumption)}</td><td>2.50</td><td>${isSewerService ? '0.23' : '0'}</td></tr>`;
+        waterTotal = base;
+        sewerTotal = isSewerService ? baseSewer : 0.0;
+        tableRowsHtml = `<tr><td>0 - 6</td><td>${formatNumber(consumption)}</td><td>${base.toFixed(2)}</td><td>${isSewerService ? baseSewer.toFixed(2) : '0'}</td></tr>`;
     } else {
-        waterTotal = 2.50;
-        sewerTotal = isSewerService ? 0.23 : 0.0;
-        tableRowsHtml = `<tr><td>0 - 6</td><td>6</td><td>2.50</td><td>${isSewerService ? '0.23' : '0'}</td></tr>`;
+        waterTotal = base;
+        sewerTotal = isSewerService ? baseSewer : 0.0;
+        tableRowsHtml = `<tr><td>0 - 6</td><td>6</td><td>${base.toFixed(2)}</td><td>${isSewerService ? baseSewer.toFixed(2) : '0'}</td></tr>`;
 
         let remaining = consumption - 6;
         for (let i = 0; i < waterTariffs.length; i++) {
             if (remaining <= 0) break;
-            const [blockSize, waterPrice] = waterTariffs[i];
-            const [_, sewerPrice] = sewerTariffs[i];
+            const [blockSize, waterPrice, sewerPrice] = waterTariffs[i];
             const used = Math.min(remaining, blockSize);
             waterTotal += used * waterPrice;
             if (isSewerService) sewerTotal += used * sewerPrice;
@@ -817,7 +842,7 @@ function calculateWaterBill() {
         }
 
         if (remaining > 0) {
-            const waterPrice = 2.20, sewerPrice = 1.20;
+            const [waterPrice, sewerPrice] = overflow;
             waterTotal += remaining * waterPrice;
             if (isSewerService) sewerTotal += remaining * sewerPrice;
             tableRowsHtml += `<tr><td>${sliceNames[5]}</td><td>${formatNumber(remaining)}</td><td>${water_fmt(waterPrice)}</td><td>${isSewerService ? water_fmt(sewerPrice) : '0'}</td></tr>`;
@@ -849,7 +874,8 @@ function calculateWaterBill() {
 // =============================================
 // window.onload — تحميل البيانات المحفوظة
 // =============================================
-window.onload = () => {
+window.onload = async () => {
+    await loadPrices();
     // استعادة التبويب النشط بعد إعادة التحميل
     const savedTab = sessionStorage.getItem('activeTab');
     if (savedTab) {
