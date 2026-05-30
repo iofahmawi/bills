@@ -471,7 +471,7 @@
     </div>
 </div>
 
-<div id="toast" style="display:none;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#323232;color:white;padding:10px 18px;border-radius:10px;font-size:0.9rem;font-weight:bold;z-index:9999;white-space:nowrap;direction:rtl;"></div>
+<div id="toast" style="display:none;position:fixed;bottom:45px;left:50%;transform:translateX(-50%);background:#323232;color:white;padding:10px 18px;border-radius:10px;font-size:0.9rem;font-weight:bold;z-index:9999;white-space:nowrap;direction:rtl;"></div>
 
 <script>
 function showToast(msg) {
@@ -495,7 +495,7 @@ async function loadPrices() {
         const found = data[year] || data[Object.keys(data).sort().pop()];
         if (found) {
             PRICES = found;
-            showToast('✓ تم تحميل أسعار ' + (data[year] ? year : Object.keys(data).sort().pop()));
+            showToast('تم تحميل أسعار ' + (data[year] ? year : Object.keys(data).sort().pop()));
         }
     } catch(e) {
         console.warn('prices.json غير موجود، يُستخدم الأسعار الافتراضية');
