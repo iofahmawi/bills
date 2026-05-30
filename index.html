@@ -471,24 +471,20 @@
     </div>
 </div>
 
+<div id="toast" style="display:none;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#323232;color:white;padding:10px 18px;border-radius:10px;font-size:0.9rem;font-weight:bold;z-index:9999;white-space:nowrap;direction:rtl;"></div>
+
 <script>
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+}
 
 // =============================================
 // أسعار افتراضية (fallback إذا لم يوجد prices.json)
 // =============================================
-let PRICES = {
-    elec: {
-        supported:   [[300, 0.05], [600, 0.10], [999999, 0.20]],
-        unsupported: [[1000, 0.12], [999999, 0.15]],
-        support:     [[51, 200, 2.5], [201, 600, 2.0]],
-        tv: 1.0, meter1: 0.20, meter3: 0.50
-    },
-    water: {
-        tariffs:   [[6, 0.60, 0.15], [6, 0.80, 0.50], [6, 1.10, 0.70], [6, 1.40, 0.85], [12, 1.80, 0.95]],
-        base: 2.50, baseSewer: 0.23,
-        overflow: [2.20, 1.20]
-    }
-};
+let PRICES = {};
 
 async function loadPrices() {
     try {
@@ -497,7 +493,10 @@ async function loadPrices() {
         const data = await res.json();
         const year = new Date().getFullYear().toString();
         const found = data[year] || data[Object.keys(data).sort().pop()];
-        if (found) PRICES = found;
+        if (found) {
+            PRICES = found;
+            showToast('✓ تم تحميل أسعار ' + (data[year] ? year : Object.keys(data).sort().pop()));
+        }
     } catch(e) {
         console.warn('prices.json غير موجود، يُستخدم الأسعار الافتراضية');
     }
