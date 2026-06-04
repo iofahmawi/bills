@@ -469,6 +469,20 @@
 <input type="file" id="drawer-import-input" accept=".json" onchange="drawerImportFile(event)">
 
 <!-- نافذة تأكيد المسح -->
+<div id="rollover-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+    <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
+        <div style="width:52px;height:52px;background:#ede9fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+        <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">ترحيل الدورة</p>
+        <p style="font-size:0.94rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">تنقل القراءة الحالية إلى السابقة وتمسح الحالية، تُستخدم عند بداية دورة فاتورة جديدة</p>
+        <div style="display:flex;gap:10px;">
+            <button id="rollover-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+            <button id="rollover-confirm" style="flex:1;height:42px;border:none;background:#7c3aed;border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">ترحيل</button>
+        </div>
+    </div>
+</div>
+
 <div id="clear-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
     <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
         <div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
@@ -984,6 +998,10 @@ if ('serviceWorker' in navigator) {
 // ترحيل الدورة
 // =============================================
 function rolloverCycle() {
+    document.getElementById('rollover-modal').style.display = 'flex';
+}
+
+function doRollover() {
     if (activeCalc === 'water') {
         const currentReading = localStorage.getItem('water_currentReading');
         if (!currentReading) {
@@ -1119,6 +1137,15 @@ document.getElementById('clear-confirm').onclick = () => {
     ALL_DATA_KEYS.forEach(k => localStorage.removeItem(k));
     document.getElementById('clear-modal').style.display = 'none';
     location.reload();
+};
+
+document.getElementById('rollover-cancel').onclick = () => {
+    document.getElementById('rollover-modal').style.display = 'none';
+};
+
+document.getElementById('rollover-confirm').onclick = () => {
+    document.getElementById('rollover-modal').style.display = 'none';
+    doRollover();
 };
 
 </script>
