@@ -317,10 +317,6 @@
     <div class="header-card">
         <button class="header-menu-btn" onclick="toggleDropdown()">⋮</button>
         <div class="dropdown-menu" id="dropdown-menu">
-            <button class="dropdown-item" id="consumption-mode-btn" onclick="toggleConsumptionMode(); closeDropdown()">
-                <div class="dropdown-item-icon" style="background:#fef3c7;color:#d97706;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-                <span id="consumption-mode-label">وضع الاستهلاك</span>
-            </button>
             <button class="dropdown-item" onclick="rolloverCycle(); closeDropdown()">
                 <div class="dropdown-item-icon" style="background:#ede9fe;color:#7c3aed;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
                 ترحيل الدورة
@@ -355,7 +351,7 @@
     <div id="section-elec">
         <div class="card">
             <div class="input-group">
-                <div class="readings-container" id="e-readings-container">
+                <div class="readings-container">
                     <div class="reading-input">
                         <label for="e-previous-reading">القراءة السابقة</label>
                         <input type="number" id="e-previous-reading" class="e-enter-next">
@@ -364,10 +360,6 @@
                         <label for="e-current-reading">القراءة الحالية</label>
                         <input type="number" id="e-current-reading" class="e-enter-next">
                     </div>
-                </div>
-                <div id="e-consumption-container" style="display:none;margin-bottom:15px;">
-                    <label for="e-direct-consumption" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:4px;padding-right:4px;font-weight:500;">كمية الاستهلاك</label>
-                    <input type="number" id="e-direct-consumption" style="width:100%;height:var(--standard-height);padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1.05rem;font-weight:600;text-align:center;background:#fdfdfd;" min="0">
                 </div>
                 <div class="extra-inputs">
                     <div style="flex:1;">
@@ -417,7 +409,7 @@
     <div id="section-water" style="display:none">
         <div class="card">
             <div class="input-group">
-                <div class="readings-container" id="w-readings-container">
+                <div class="readings-container">
                     <div class="reading-input">
                         <label for="w-previous-reading">القراءة السابقة</label>
                         <input type="number" id="w-previous-reading" class="w-hide-kb" step="1" min="0">
@@ -426,10 +418,6 @@
                         <label for="w-current-reading">القراءة الحالية</label>
                         <input type="number" id="w-current-reading" class="w-hide-kb" step="1" min="0">
                     </div>
-                </div>
-                <div id="w-consumption-container" style="display:none;margin-bottom:15px;">
-                    <label for="w-direct-consumption" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:4px;padding-right:4px;font-weight:500;">كمية الاستهلاك</label>
-                    <input type="number" id="w-direct-consumption" class="w-hide-kb" style="width:100%;height:var(--standard-height);padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1.05rem;font-weight:600;text-align:center;background:#fdfdfd;" step="1" min="0">
                 </div>
 
             </div>
@@ -625,10 +613,8 @@ function elec_calculateAndSave() {
     if (document.activeElement) document.activeElement.blur();
     const success = calculateElectricBill();
     if (success) {
-        if (!consumptionMode) {
-            localStorage.setItem('calculator_currentReading', document.getElementById('e-current-reading').value);
-            localStorage.setItem('calculator_previousReading', document.getElementById('e-previous-reading').value);
-        }
+        localStorage.setItem('calculator_currentReading', document.getElementById('e-current-reading').value);
+        localStorage.setItem('calculator_previousReading', document.getElementById('e-previous-reading').value);
         localStorage.setItem('calculator_day', document.getElementById('e-reading-day').dataset.value || document.getElementById('e-reading-day').value);
         localStorage.setItem('calculator_waste', document.getElementById('e-waste-fee').value);
         localStorage.setItem('calculator_phase', document.querySelector('input[name="e-meter-phase"]:checked').value);
@@ -650,35 +636,21 @@ function calculateElectricBill() {
     const wasteFeeValue        = wasteInput.value.trim() === "" ? 3 : parseFloat(wasteInput.value);
     const phaseValue           = parseInt(phaseInput.value);
 
-    let consumption;
+    if (currentReadingValue === '') {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>', 'فاتورة-الكهرباء');
+        return false;
+    }
+
+    const currentReading  = parseFloat(currentReadingValue);
+    const hasPrevious     = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
+    const previousReading = hasPrevious ? parseFloat(previousReadingValue) : 0;
+    const consumption     = currentReading - previousReading;
     const subscriptionType = subscriptionTypeInput.value;
 
-    if (consumptionMode) {
-        const directVal = document.getElementById('e-direct-consumption').value.trim();
-        if (directVal === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'فاتورة-الكهرباء');
-            return false;
-        }
-        consumption = parseFloat(directVal);
-        if (isNaN(consumption) || consumption < 0) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'فاتورة-الكهرباء');
-            return false;
-        }
-    } else {
-        if (currentReadingValue === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>', 'فاتورة-الكهرباء');
-            return false;
-        }
-        const currentReading  = parseFloat(currentReadingValue);
-        const prevExists      = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
-        const previousReading = prevExists ? parseFloat(previousReadingValue) : 0;
-        consumption = currentReading - previousReading;
-        if (consumption < 0) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>', 'فاتورة-الكهرباء');
-            return false;
-        }
+    if (consumption < 0) {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>', 'فاتورة-الكهرباء');
+        return false;
     }
-    const hasPrevious = !consumptionMode && (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
 
     let avgDivHtml = "";
     if (hasPrevious && readingDayValue !== "") {
@@ -787,10 +759,8 @@ function water_runCalculation() {
     if (document.activeElement) document.activeElement.blur();
     const success = calculateWaterBill();
     if (success) {
-        if (!consumptionMode) {
-            localStorage.setItem('water_currentReading', document.getElementById('w-current-reading').value);
-            localStorage.setItem('water_previousReading', document.getElementById('w-previous-reading').value);
-        }
+        localStorage.setItem('water_currentReading', document.getElementById('w-current-reading').value);
+        localStorage.setItem('water_previousReading', document.getElementById('w-previous-reading').value);
         localStorage.setItem('water_sewerService', document.querySelector('input[name="w-sewer-service"]:checked').value);
     }
 }
@@ -821,33 +791,21 @@ function calculateWaterBill() {
     const currentReadingValue  = currentReadingInput.value.trim();
     const previousReadingValue = previousReadingInput.value.trim();
 
-    let consumption;
-
-    if (consumptionMode) {
-        const directVal = document.getElementById('w-direct-consumption').value.trim();
-        if (directVal === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'فاتورة-المياه');
-            return false;
-        }
-        consumption = parseInt(directVal, 10);
-        if (isNaN(consumption) || consumption < 0) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'فاتورة-المياه');
-            return false;
-        }
-    } else {
-        if (currentReadingValue === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-المياه');
-            return false;
-        }
-        const currentReading  = parseInt(currentReadingValue, 10);
-        const hasPrevious     = (previousReadingValue !== '' && parseInt(previousReadingValue, 10) >= 0);
-        const previousReading = hasPrevious ? parseInt(previousReadingValue, 10) : 0;
-        if (hasPrevious && currentReading < previousReading) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-المياه');
-            return false;
-        }
-        consumption = currentReading - previousReading;
+    if (currentReadingValue === '') {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-المياه');
+        return false;
     }
+
+    const currentReading  = parseInt(currentReadingValue, 10);
+    const hasPrevious     = (previousReadingValue !== '' && parseInt(previousReadingValue, 10) >= 0);
+    const previousReading = hasPrevious ? parseInt(previousReadingValue, 10) : 0;
+
+    if (hasPrevious && currentReading < previousReading) {
+        showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-المياه');
+        return false;
+    }
+
+    const consumption = currentReading - previousReading;
     const { tariffs: waterTariffs, base, baseSewer, overflow } = PRICES.water;
     const sliceNames = [ "7 - 12", "13 - 18", "19 - 24", "25 - 30", "31 - 42", "43 فما فوق" ];
 
@@ -1003,25 +961,8 @@ function rolloverCycle() {
 }
 
 // =============================================
-// وضع كمية الاستهلاك المباشر
+// القائمة المنسدلة
 // =============================================
-let consumptionMode = false;
-
-function toggleConsumptionMode() {
-    consumptionMode = !consumptionMode;
-    const label = document.getElementById('consumption-mode-label');
-    label.textContent = consumptionMode ? 'وضع القراءات' : 'وضع الاستهلاك';
-
-    // الكهرباء
-    document.getElementById('e-readings-container').style.display = consumptionMode ? 'none' : 'flex';
-    document.getElementById('e-consumption-container').style.display = consumptionMode ? 'block' : 'none';
-
-    // المياه
-    document.getElementById('w-readings-container').style.display = consumptionMode ? 'none' : 'flex';
-    document.getElementById('w-consumption-container').style.display = consumptionMode ? 'block' : 'none';
-}
-
-
 const dropdownMenu = document.getElementById('dropdown-menu');
 
 function toggleDropdown() {
