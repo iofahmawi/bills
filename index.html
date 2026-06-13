@@ -650,7 +650,7 @@ function getFullCost(cons, subType, waste, phase) {
         }
     }
     let support = 0;
-    if (subType === 'supported') {
+    if (subType === 'supported' && cons > flatLimit) {
         for (const [from, to, val] of PRICES.elec.support) {
             if (cons >= from && cons <= to) { support = val; break; }
         }
@@ -764,7 +764,7 @@ function calculateElectricBill() {
 
     if (consumption <= flatLimit) {
         totalEnergyCost = flatPrice;
-        tableRowsHtml += `<tr><td>1 - ${flatLimit}</td><td>${formatNumber(consumption)}</td><td>سعر الحزمة</td><td>${elec_fmt(flatPrice)}</td></tr>`;
+        tableRowsHtml += `<tr><td>1 - ${flatLimit}</td><td>${formatNumber(consumption)}</td><td>حد أدنى</td><td>${elec_fmt(flatPrice)}</td></tr>`;
     } else {
         let remaining = consumption;
         let acc_cons = 0;
@@ -786,7 +786,7 @@ function calculateElectricBill() {
     }
 
     let governmentSupport = 0.0;
-    if (subscriptionType === 'supported') {
+    if (subscriptionType === 'supported' && consumption > flatLimit) {
         for (const [from, to, val] of PRICES.elec.support) {
             if (consumption >= from && consumption <= to) { governmentSupport = val; break; }
         }
