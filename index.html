@@ -504,8 +504,8 @@
 // =============================================
 const FALLBACK_PRICES = {
     "elec": {
-        "supported":   [[300, 0.05], [600, 0.10], [999999, 0.20]],
-        "unsupported": [[1000, 0.12], [999999, 0.15]],
+        "supported":   [[85, 1.75], [300, 0.05], [600, 0.10], [999999, 0.20]],
+        "unsupported": [[14, 1.75], [1000, 0.12], [999999, 0.15]],
         "support":     [[51, 200, 2.5], [201, 600, 2.0]],
         "tv":     1.0,
         "meter1": 0.20,
@@ -632,15 +632,22 @@ document.getElementById('e-reading-day').addEventListener('blur', function() {
 
 
 function getFullCost(cons, subType, waste, phase) {
-    let energyCost = 0, remaining = cons, acc = 0;
     const tariffs = subType === 'supported' ? PRICES.elec.supported : PRICES.elec.unsupported;
-    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
-        const [limit, price] = tariffs[i];
-        const size = limit >= 999999 ? Infinity : (limit - acc);
-        const used = Math.min(remaining, size);
-        energyCost += used * price;
-        remaining -= used;
-        acc += used;
+    const [flatLimit, flatPrice] = tariffs[0];
+    let energyCost;
+    if (cons <= flatLimit) {
+        energyCost = flatPrice;
+    } else {
+        energyCost = 0;
+        let remaining = cons, acc = 0;
+        for (let i = 1; i < tariffs.length && remaining > 0; i++) {
+            const [limit, price] = tariffs[i];
+            const size = limit >= 999999 ? Infinity : (limit - acc);
+            const used = Math.min(remaining, size);
+            energyCost += used * price;
+            remaining -= used;
+            acc += used;
+        }
     }
     let support = 0;
     if (subType === 'supported') {
@@ -752,22 +759,29 @@ function calculateElectricBill() {
 
     let totalEnergyCost = 0.0;
     let tableRowsHtml = '';
-    let remaining = consumption;
     let tariffs = subscriptionType === 'supported' ? PRICES.elec.supported : PRICES.elec.unsupported;
-    let acc_cons = 0;
-    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
-        const [limit, price] = tariffs[i];
-        const start = acc_cons + 1;
-        const end = limit >= 999999 ? Infinity : limit;
-        const size = end === Infinity ? Infinity : (end - acc_cons);
-        const used = Math.min(remaining, size);
-        const cost = parseFloat((used * price).toFixed(5));
-        totalEnergyCost += cost;
-        remaining -= used;
-        acc_cons += used;
-        let label = end === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
-        if (used > 0) {
-            tableRowsHtml += `<tr><td>${label}</td><td>${formatNumber(used)}</td><td>${elec_fmt(price)}</td><td>${elec_fmt(cost)}</td></tr>`;
+    const [flatLimit, flatPrice] = tariffs[0];
+
+    if (consumption <= flatLimit) {
+        totalEnergyCost = flatPrice;
+        tableRowsHtml += `<tr><td>1 - ${flatLimit}</td><td>${formatNumber(consumption)}</td><td>سعر الحزمة</td><td>${elec_fmt(flatPrice)}</td></tr>`;
+    } else {
+        let remaining = consumption;
+        let acc_cons = 0;
+        for (let i = 1; i < tariffs.length && remaining > 0; i++) {
+            const [limit, price] = tariffs[i];
+            const start = acc_cons + 1;
+            const end = limit >= 999999 ? Infinity : limit;
+            const size = end === Infinity ? Infinity : (end - acc_cons);
+            const used = Math.min(remaining, size);
+            const cost = parseFloat((used * price).toFixed(5));
+            totalEnergyCost += cost;
+            remaining -= used;
+            acc_cons += used;
+            let label = end === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
+            if (used > 0) {
+                tableRowsHtml += `<tr><td>${label}</td><td>${formatNumber(used)}</td><td>${elec_fmt(price)}</td><td>${elec_fmt(cost)}</td></tr>`;
+            }
         }
     }
 
