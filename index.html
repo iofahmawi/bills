@@ -1,2156 +1,1153 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" style="background-color:#f0f4f8">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#f3f4f6">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="أدوات الإنترنت">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icon-1440.png">
-    <title>أدوات الإنترنت</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>حاسبة الفواتير</title>
+    <meta name="theme-color" content="#f0f4f8">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-1024.png">
+    <link rel="apple-touch-icon" href="icon-1024.png">
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            --accent-color: #4f46e5;
-            --bg-page: #f3f4f6;
-            --bg-card: #ffffff;
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --secondary-green: #10b981;
+            --white: #ffffff;
+            --bg-light: #f0f4f8;
             --text-main: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #cbd5e1;
+            --text-muted: #64748b;
+            --error-red: #ef4444;
+            --radius: 16px;
+            --shadow: 0 8px 20px -5px rgba(0,0,0,0.04), 0 6px 8px -5px rgba(0,0,0,0.04);
+            --standard-height: 42px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; scrollbar-width: none; }
-        *::-webkit-scrollbar { display: none; }
+        * {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        html, body { height: 100%; background-color: var(--bg-light); }
 
         body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* ========== CARD HEADER ROW ========== */
-        .card-header {
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            min-height: 36px;
-        }
-        .card-header h1 {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #111827;
-            margin: 0;
-            padding: 0;
-            flex: 1;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.2;
-        }
-        .header-spacer { width: 36px; flex-shrink: 0; }
-
-        .menu-btn {
-            width: 36px;
-            height: 36px;
-            background: #f1f5f9;
-            border: none;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-            flex-shrink: 0;
-            transition: background 0.2s;
-            position: relative;
-            top: -5px;
-        }
-        .menu-btn:active { background: #e2e8f0; }
-
-        /* ========== SIDEBAR ========== */
-        .sidebar-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 200;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .sidebar-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 15px;
-            right: -270px;
-            width: 270px;
-            height: calc(100% - 30px);
-            background: white;
-            z-index: 201;
-            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
-            display: flex;
-            flex-direction: column;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-            border-radius: 14px 0 0 14px;
-            overflow: hidden;
-        }
-        .sidebar.open { right: 0; }
-
-        .sidebar-header {
-            background: var(--primary-gradient);
-            padding: 24px 20px 16px;
-            color: white;
-        }
-        .sidebar-header .app-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-        }
-        .sidebar-header h2 { font-size: 1.1rem; font-weight: 800; }
-        .sidebar-header p { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
-
-        .sidebar-nav { padding: 6px 10px; }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 11px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-bottom: 2px;
-            border: none;
-            background: transparent;
-            width: 100%;
+            direction: rtl;
             text-align: right;
-            font-family: 'Tajawal', sans-serif;
-        }
-        .nav-item:active { background: #f1f5f9; }
-        .nav-item.active-nav {
-            background: #eef2ff;
-        }
-
-        .nav-item-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: #f1f5f9;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: var(--text-secondary);
-        }
-        .nav-item.active-nav .nav-item-icon {
-            background: var(--accent-color);
-            color: white;
-        }
-        .nav-item-text { flex: 1; }
-        .nav-item-title {
-            font-size: 0.95rem;
-            font-weight: 700;
+            flex-direction: column;
             color: var(--text-main);
-            display: block;
-        }
-        .nav-item.active-nav .nav-item-title { color: var(--accent-color); }
-        .nav-item-subtitle {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            display: block;
-            margin-top: 2px;
         }
 
-        .nav-divider {
-            height: 1px;
-            background: #f1f5f9;
-            margin: 6px 14px;
-        }
+        .content-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
 
-        /* ========== PAGES ========== */
-        .page { display: none; padding: 0.6cm 13px 50px; }
-        .page.active { display: block; }
-        @media (display-mode: standalone) {
-            body:has(#page-usage.active) { overflow: hidden; }
-            body:has(#page-speed.active) { overflow: hidden; }
-            body:has(#page-speed.active #result[style*="flex"]) { overflow: auto; }
-        }
-
-        /* ========== SPEED CALCULATOR ========== */
-        .main-container {
-            background-color: var(--bg-card);
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto 30px;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            padding: 25px 25px 30px;
+        /* ===== Header Card ===== */
+        .header-card {
+            background: var(--primary);
+            border-radius: var(--radius);
+            box-shadow: 0 3px 10px -2px rgba(37,99,235,0.14);
+            padding: 19px 20px 9px;
+            width: 92%;
+            max-width: 450px;
+            margin: 20px auto 0;
             position: relative;
         }
-
-        .section-title {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            margin: 20px 0 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e5e7eb;
-        }
-
-        .device-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-        }
-
-        .device-info { display: flex; align-items: center; gap: 12px; }
-
-        .icon-box {
-            width: 38px;
-            height: 38px;
-            background: #eef2ff;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-color);
-            flex-shrink: 0;
-        }
-        .icon-box svg { width: 20px; height: 20px; }
-
-        .device-name { font-weight: 700; font-size: 0.95rem; color: #374151; }
-
-        .stepper {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100px;
-            min-width: 100px;
-            max-width: 100px;
-            height: 32px;
-            min-height: 32px;
-            max-height: 32px;
-            padding: 0;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-
-        .stepper-btn {
-            width: 32px;
-            height: 32px;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            flex-shrink: 0;
-            line-height: 1.2;
-            padding: 0;
-        }
-        .stepper-btn:active { background-color: #f1f5f9; }
-
-        .stepper-value {
-            flex: 1;
-            width: 36px;
-            height: 32px;
-            background: transparent;
-            border: none;
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0;
-            outline: none;
-            font-family: 'Tajawal', sans-serif;
-            padding: 6px 0 0 0;
-            line-height: normal;
-        }
-
-        .action-btn {
-            display: block;
-            width: 70%;
-            max-width: 280px;
-            margin: 25px auto 5px;
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 10px 20px 8px;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-            font-family: 'Tajawal', sans-serif;
-        }
-        .action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .action-btn:active { transform: translateY(1px); }
-
-        .result-panel {
-            margin-top: 25px;
-            padding: 30px 20px;
-            background: linear-gradient(to bottom, #ffffff, #f8fafc);
-            border: 2px solid #eef2ff;
-            border-radius: 20px;
-            text-align: center;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .result-label { font-size: 0.95rem; color: var(--text-secondary); margin: 0; margin-bottom: 15px; }
-
-        .speed-display {
-            font-size: 3.2rem;
-            font-weight: 800;
-            line-height: 1.3;
-            padding-top: 4px;
-            display: inline-block;
-            margin: 0;
-            margin-bottom: 6px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            direction: ltr;
-        }
-
-        .result-details {
-            background: #ffffff;
-            border-radius: 50px;
-            border: 1px solid #e5e7eb;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            display: inline-flex;
-            justify-content: center;
-            padding: 9px 16px 5px;
-            line-height: normal;
-            gap: 5px;
-            white-space: nowrap;
-        }
-        .result-details b { position: relative; top: 1px; color: var(--accent-color); }
-
-        /* ========== CONSUMPTION CALCULATOR ========== */
-        .cons-card {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            max-width: 480px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cons-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px 20px;
-            margin-bottom: 18px;
-        }
-
-        .cons-group { position: relative; }
-        .cons-label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #374151;
-            text-align: center;
-        }
-
-        .cons-input-wrap { position: relative; width: 100%; }
-        .cons-input-wrap::after {
-            content: "";
+        .header-menu-btn {
             position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 5px solid white;
-            pointer-events: none;
-        }
-
-        .cons-input {
-            width: 100%;
-            height: 40px;
-            min-height: 42px;
-            max-height: 42px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 1rem;
-            text-align: center;
-            outline: none;
-            background-color: #fff;
-            display: block;
-            appearance: none;
-            -webkit-appearance: none;
-            font-family: 'Tajawal', sans-serif;
-            color: var(--text-main);
-            font-weight: 500;
-            padding: 7px 10px 0 10px;
-            line-height: normal;
-            transition: border-color 0.2s;
-            box-sizing: border-box;
-        }
-        .cons-input-wrap .cons-input {
-            padding-left: 30px;
-        }
-        .cons-input:focus {
-            border-color: var(--accent-color);
-        }
-
-        .cons-btn {
-            display: block;
-            width: 70%;
-            max-width: 280px;
-            margin: 8px auto 0;
-            background: var(--primary-gradient);
+            left: 10px;
+            top: 14px;
+            background: none;
+            border: none;
             color: white;
-            border: none;
-            padding: 11px 20px 9px;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 50px;
+            width: 30px;
+            height: 30px;
+            font-size: 1.25rem;
             cursor: pointer;
-            font-family: 'Tajawal', sans-serif;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-        .cons-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .cons-btn:active { transform: translateY(1px); }
-        .cons-btn { margin-top: 28px; }
-
-        .cons-result {
-            display: none;
-            margin-top: 25px;
-            animation: fadeIn 0.3s ease;
-            background: linear-gradient(to bottom, #ffffff, #f8fafc);
-            border: 2px solid #eef2ff;
-            border-radius: 20px;
-            padding: 19px;
-            text-align: center;
-        }
-
-        .cons-main-result {
-            text-align: center;
-            margin-bottom: 9px;
-            padding: 0;
-            background: transparent;
-            border-radius: 0;
-        }
-        .cons-main-label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 0.88rem;
-            margin-bottom: 16px;
-        }
-        .cons-main-value {
-            display: block;
-            font-size: 3rem;
-            font-weight: 800;
-            direction: ltr;
-            line-height: 1.2;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .cons-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .cons-stat-item {
-            background: white;
-            border: 1px solid #e0e7ff;
-            border-radius: 14px;
-            padding: 12px 10px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            gap: 2px;
-        }
-        .cons-stat-label {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            display: block;
-            min-height: 2.2em;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            line-height: 1.3;
-        }
-        .cons-stat-value {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            direction: ltr;
-            display: block;
-        }
-        #daysPassed { direction: rtl; }
-        #consumed { direction: ltr; }
-        #luxuryStatus { direction: rtl; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .cons-full { grid-column: 1 / -1; }
-
-        /* native date/time inputs */
-        input[type="date"], input[type="time"] {
-            color-scheme: light;
-        }
-
-        @media (display-mode: standalone) {
-            .page { padding-top: 0.50cm; }
-        }
-
-        /* ========== CONFIRM MODAL ========== */
-        .confirm-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.35);
-            z-index: 300;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-        }
-        .confirm-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        .confirm-sheet {
-            background: white;
-            width: 100%;
-            max-width: 320px;
-            border-radius: 24px;
-            padding: 28px 24px 24px;
-            transform: scale(0.92);
-            transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-        }
-        .confirm-overlay.active .confirm-sheet {
-            transform: scale(1);
-        }
-        .confirm-icon {
-            width: 52px;
-            height: 52px;
-            background: #fff0f0;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-        }
-        .confirm-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: #111827;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-        .confirm-subtitle {
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            text-align: center;
-            line-height: 1.6;
-            margin-bottom: 24px;
-        }
-        .confirm-btns {
-            display: flex;
-            flex-direction: row-reverse;
-            gap: 10px;
-        }
-        .confirm-btn-danger {
-            flex: 1;
-            padding: 13px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .confirm-btn-danger:active { opacity: 0.85; }
-        .confirm-btn-cancel {
-            flex: 1;
-            padding: 13px;
-            background: #f1f5f9;
-            color: var(--text-main);
-            border: none;
-            border-radius: 14px;
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .confirm-btn-cancel:active { background: #e2e8f0; }
-
-        /* ========== SIDEBAR FOOTER ========== */
-        .sidebar-footer {
-            padding: 10px 10px 24px;
-            border-top: 1px solid #f1f5f9;
-        }
-        .sidebar-action-btn {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 11px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            width: 100%;
-            background: transparent;
-            border: none;
-            text-align: right;
-            font-family: 'Tajawal', sans-serif;
-            margin-bottom: 2px;
-            transition: background 0.2s;
-        }
-        .sidebar-action-btn:active { background: #f1f5f9; }
-        .sidebar-action-btn .sab-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: #f1f5f9;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .sidebar-action-btn .sab-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* ========== TOAST ========== */
-        .toast {
-            position: fixed;
-            bottom: 32px;
-            left: 50%;
-            transform: translateX(-50%) translateY(16px);
-            background: #1e293b;
-            color: white;
-            padding: 11px 24px 9px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            font-family: 'Tajawal', sans-serif;
-            opacity: 0;
-            transition: opacity 0.25s, transform 0.25s;
-            z-index: 999;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* ========== CONS ERROR ========== */
-        .cons-error {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            margin-top: 14px;
-            padding: 10px 16px;
-            background: #eef2ff;
-            border-radius: 50px;
-            animation: fadeSlideIn 0.2s ease;
-        }
-        .cons-error.show { display: flex; }
-        .cons-error svg { color: var(--accent-color); flex-shrink: 0; }
-        .cons-error-text {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--accent-color);
-        }
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(-4px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        /* ========== STREAMING CALCULATOR ========== */
-        .stream-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 4px;
-        }
-        .stream-field {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .stream-label {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: #374151;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .stream-label-badge {
-            display: inline-block;
-            background: #eef2ff;
-            color: var(--accent-color);
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 4px 8px 0px;
-            border-radius: 20px;
-            vertical-align: middle;
-            position: relative;
-            top: -3px;
-        }
-        .stream-input {
-            width: 100%;
-            height: 42px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            text-align: center;
-            outline: none;
-            background: #fff;
-            color: var(--text-main);
-            transition: border-color 0.2s;
-            box-sizing: border-box;
-            appearance: none;
-            -webkit-appearance: none;
-            padding: 0;
-            line-height: normal;
-            display: block;
-        }
-        .stream-input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-        }
-        .stream-duration-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .stream-result {
-            display: none;
-            margin-top: 25px;
-            background: linear-gradient(to bottom, #ffffff, #f8fafc);
-            border-radius: 20px;
-            padding: 30px 20px;
-            text-align: center;
-            animation: fadeIn 0.3s ease;
-            border: 2px solid #eef2ff;
-        }
-        .stream-result-label {
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            display: block;
-        }
-        .stream-result-value {
-            font-size: 3rem;
-            font-weight: 800;
-            font-family: 'Tajawal', sans-serif;
-            direction: ltr;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            display: inline-block;
-            padding-top: 0;
-        }
-        .stream-result-unit {
-            font-size: 1.8rem;
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 800;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline;
-            margin-left: 6px;
-        }
-        .stream-result-number-line {
-            display: block;
-            direction: ltr;
-            text-align: center;
-        }
-        .stream-result-sub {
-            margin-top: 8px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        .stream-sub-pill {
-            background: white;
-            border: 1px solid #e0e7ff;
-            border-radius: 50px;
-            padding: 6px 14px 4px;
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .stream-sub-pill b { color: var(--accent-color); }
-        .stream-error {
-            display: none;
-            align-items: center;
-            gap: 7px;
-            margin-top: 14px;
-            padding: 10px 16px;
-            background: #eef2ff;
-            border-radius: 50px;
-            animation: fadeSlideIn 0.2s ease;
-        }
-        .stream-error.show { display: flex; }
-        .stream-error-text {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--accent-color);
-        }
-
-        /* ========== BITRATE CALCULATOR ========== */
-        .bitrate-group { margin-bottom: 18px; }
-        .bitrate-group .cons-label { text-align: right; margin-bottom: 8px; }
-        .bitrate-size-row { display: flex; gap: 10px; }
-        .bitrate-size-row .cons-input { flex: 1; }
-        .bitrate-unit-toggle {
-            width: 120px;
-            height: 42px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            background: #fff;
-            color: var(--text-main);
-            font-family: 'Tajawal', sans-serif;
-            cursor: pointer;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-top: 3px;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-        .bitrate-unit-toggle:active { background: #f8fafc; }
-        .bitrate-time-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .bitrate-time-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            align-items: center;
-        }
-        .bitrate-time-item .cons-input { text-align: center; width: 100%; }
-        .bitrate-time-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-        }
-        .bitrate-result {
-            display: none;
-            margin-top: 25px;
-            background: linear-gradient(to bottom, #ffffff, #f8fafc);
-            border-radius: 20px;
-            padding: 30px 20px;
-            text-align: center;
-            animation: fadeIn 0.3s ease;
-            border: 2px solid #eef2ff;
-        }
-        .bitrate-result .stream-result-label { margin-bottom: 20px; }
-        .bitrate-result .stream-result-value { padding-top: 0; line-height: 1.2; font-size: 3rem; }
-        .bitrate-result .stream-result-sub { margin-top: 8px; }
-
-        /* ========== SPEED TEST ========== */
-        .spt-gauge-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 14px 0 6px;
-        }
-        .spt-gauge {
-            position: relative;
-            width: 170px;
-            height: 170px;
-        }
-        .spt-gauge svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-        .spt-track {
-            fill: none;
-            stroke: #f1f5f9;
-            stroke-width: 12;
-        }
-        .spt-arc {
-            fill: none;
-            stroke: url(#sptGrad);
-            stroke-width: 12;
-            stroke-linecap: round;
-            stroke-dasharray: 452.4;
-            stroke-dashoffset: 452.4;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-        .spt-center {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-        }
-        .spt-val {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            padding-top: 4px;
-            display: inline-block;
-            direction: ltr;
-        }
-        .spt-unit-lbl {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-        }
-        .spt-status-txt {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-top: 14px;
-            text-align: center;
-            min-height: 1.3em;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .spt-status-txt.fade-update {
-            opacity: 0;
-            transform: translateY(-6px);
-        }
-        .spt-dot {
-            display: inline-block;
-            opacity: 0;
-            animation: sptDotBlink 1.2s infinite;
-        }
-        .spt-dot:nth-child(2) { animation-delay: 0.2s; }
-        .spt-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes sptDotBlink {
-            0%, 80%, 100% { opacity: 0; }
-            40% { opacity: 1; }
-        }
-        .spt-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 22px;
-        }
-        .spt-metric {
-            background: white;
-            border: 1px solid #e0e7ff;
-            border-radius: 14px;
-            padding: 13px 8px 11px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .spt-metric:active { border-color: var(--accent-color); }
-        .spt-data-row {
-            display: none;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .spt-data-row.visible { display: grid; }
-        .spt-data-card {
-            background: white;
-            border: 1px solid #e0e7ff;
-            border-radius: 14px;
-            padding: 13px 8px 11px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        .spt-metric-label {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            display: block;
-        }
-        .spt-metric-val {
-            margin-top: 6px;
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            direction: ltr;
-            display: block;
             line-height: 1;
         }
-        .spt-metric-unit {
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: #94a3b8;
+        .dropdown-menu {
+            position: absolute;
+            left: 10px;
+            top: 52px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 155px;
+            overflow: hidden;
+            display: none;
+        }
+        .dropdown-menu.open { display: block; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 14px;
+            background: none;
+            border: none;
+            border-bottom: none;
+            width: 100%;
+            text-align: right;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: var(--text-main);
+            font-family: inherit;
+            direction: rtl;
+        }
+        .dropdown-item:active { background: var(--bg-light); }
+        .dropdown-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .dropdown-item-icon.blue  { background: var(--primary-light); color: var(--primary); }
+        .dropdown-item-icon.green { background: #d1fae5; color: #059669; }
+        .dropdown-item-icon.red   { background: #fee2e2; color: var(--error-red); }
+        .dropdown-item + .dropdown-item { border-top: 1px solid #f1f5f9; }
+
+        @media (display-mode: standalone), (display-mode: fullscreen) {
+            .header-card {
+                padding-top: 21px;
+                padding-bottom: 11px;
+            }
         }
 
+        .app-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            height: 44px;
+            align-items: center;
+        }
+
+        .tab-btn {
+            flex: 1;
+            height: 100%;
+            border: none;
+            background: transparent;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.55);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .tab-btn.active {
+            color: var(--white);
+            font-size: 1rem;
+        }
+
+        /* ===== Card ===== */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            width: 92%;
+            max-width: 450px;
+            margin: 19px auto 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        .readings-container, .extra-inputs { display: flex; gap: 12px; margin-bottom: 15px; }
+        .reading-input, .waste-input-wrapper { flex: 1; }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            padding-right: 4px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: var(--standard-height);
+            padding: 6px 10px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+            background: #fdfdfd;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: var(--white);
+        }
+
+        #e-reading-day { direction: rtl; text-align: center; }
+
+        /* ===== Radio ===== */
+        .radio-group { margin: 15px 0; }
+        .radio-options {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 5px;
+            height: var(--standard-height);
+            align-items: center;
+        }
+
+        .radio-option { flex: 1; position: relative; height: 100%; }
+        .radio-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+        .radio-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            margin-bottom: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* ===== Button ===== */
+        .calculate-btn {
+            width: 100%;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            height: var(--standard-height);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        .calculate-btn:active { transform: scale(0.98); }
+
+        /* ===== Modal ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.8);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000; padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            width: 100%; max-width: 450px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            cursor: pointer;
+        }
+        #modal-results-content { padding: 25px 15px; }
+
+        /* ===== Result styles ===== */
+        .result-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0; font-size: 0.95rem; }
+        .result-text-value { display: inline-flex; gap: 12px; align-items: baseline; }
+        .result-label { color: var(--text-main); font-weight: 500; }
+        .result-value { color: var(--text-main); font-weight: 700; }
+        hr { border: none; border-top: 1px solid #e4e9ee; margin: 15px 10px; }
+        .final-total-section { text-align: center; margin-top: 10px; }
+        .final-total-section p { font-size: 1rem; color: var(--text-main); margin: 0; }
+        .final-total-section span { font-size: 1.55rem; font-weight: 800; color: var(--secondary-green); display: block; margin-top: 7px; line-height: 1; }
+        .table-container { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 15px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { border-bottom: 1px solid #f1f5f9; padding: 10px 6px; text-align: center; line-height: 1.2; }
+        th { background-color: #f8fafc; color: var(--primary); font-weight: 700; }
+
+        
+
+        /* ===== Footer ===== */
+        .simple-footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding: 20px 0 calc(15px + env(safe-area-inset-bottom, 0px));
+        }
+        .simple-footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
+
+        #drawer-import-input { display: none; }
     </style>
 </head>
 <body>
 
-<!-- Sidebar Overlay -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="content-wrapper">
 
-<!-- Sidebar -->
-<nav class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="app-icon">
-            <svg width="26" height="26" fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24">
-                <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                <line x1="12" y1="20" x2="12.01" y2="20"></line>
-            </svg>
+    <!-- Header Card -->
+    <div class="header-card">
+        <button class="header-menu-btn" onclick="toggleDropdown()">⋮</button>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <button class="dropdown-item" id="consumption-mode-btn" onclick="toggleConsumptionMode(); closeDropdown()">
+                <div class="dropdown-item-icon" style="background:#fef3c7;color:#d97706;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <span id="consumption-mode-label">وضع الاستهلاك</span>
+            </button>
+            <button class="dropdown-item" onclick="rolloverCycle(); closeDropdown()">
+                <div class="dropdown-item-icon" style="background:#ede9fe;color:#7c3aed;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
+                ترحيل الدورة
+            </button>
+            <button class="dropdown-item" onclick="drawerImport(); closeDropdown()">
+                <div class="dropdown-item-icon blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                استيراد البيانات
+            </button>
+            <button class="dropdown-item" onclick="drawerExport(); closeDropdown()">
+                <div class="dropdown-item-icon green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                تصدير البيانات
+            </button>
+            <button class="dropdown-item" onclick="drawerClear(); closeDropdown()">
+                <div class="dropdown-item-icon red"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+                مسح البيانات
+            </button>
         </div>
-        <h2>أدوات الإنترنت</h2>
-        <p>حاسبات سرعة واستهلاك الإنترنت</p>
-    </div>
-
-    <div class="sidebar-nav">
-        <button class="nav-item active-nav" id="nav-usage" onclick="navigateTo('usage')">
-            <div class="nav-item-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-            </div>
-            <div class="nav-item-text">
-                <span class="nav-item-title">معدل الاستهلاك</span>
-                <span class="nav-item-subtitle">تتبع استهلاكك اليومي</span>
-            </div>
-        </button>
-
-        <div class="nav-divider"></div>
-
-        <button class="nav-item" id="nav-speed" onclick="navigateTo('speed')">
-            <div class="nav-item-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                </svg>
-            </div>
-            <div class="nav-item-text">
-                <span class="nav-item-title">السرعة المناسبة</span>
-                <span class="nav-item-subtitle">السرعة المناسبة لاشتراكك</span>
-            </div>
-        </button>
-
-        <div class="nav-divider"></div>
-
-        <button class="nav-item" id="nav-speedtest" onclick="navigateTo('speedtest')">
-            <div class="nav-item-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M3 17a9 9 0 0 1 18 0" stroke-linecap="round"/>
-                    <line x1="12" y1="17" x2="17" y2="10" stroke-linecap="round"/>
-                    <circle cx="12" cy="17" r="1.5" fill="currentColor" stroke="none"/>
-                </svg>
-            </div>
-            <div class="nav-item-text">
-                <span class="nav-item-title">قياس السرعة</span>
-                <span class="nav-item-subtitle">اختبر سرعة اتصالك الآن</span>
-            </div>
-        </button>
-
-        <div class="nav-divider"></div>
-
-        <button class="nav-item" id="nav-streaming" onclick="navigateTo('streaming')">
-            <div class="nav-item-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"></circle>
-                    <path d="M12 7A5 5 0 0 0 12 17"></path>
-                    <path d="M12 7A5 5 0 0 1 12 17"></path>
-                    <path d="M12 3.5A8.5 8.5 0 0 0 12 20.5"></path>
-                    <path d="M12 3.5A8.5 8.5 0 0 1 12 20.5"></path>
-                </svg>
-            </div>
-            <div class="nav-item-text">
-                <span class="nav-item-title">حاسبة البث المباشر</span>
-                <span class="nav-item-subtitle">استهلاك البث حسب المدة</span>
-            </div>
-        </button>
-
-        <div class="nav-divider"></div>
-
-        <button class="nav-item" id="nav-bitrate" onclick="navigateTo('bitrate')">
-            <div class="nav-item-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                    <polyline points="22 12 18 12 15 20 9 4 6 12 2 12"/>
-                </svg>
-            </div>
-            <div class="nav-item-text">
-                <span class="nav-item-title">حاسبة معدل البت</span>
-                <span class="nav-item-subtitle">معدل البت للفيديو</span>
-            </div>
-        </button>
-
-        <div class="nav-divider"></div>
-
-        <button class="sidebar-action-btn" onclick="document.getElementById('importFileInput').click()">
-            <div class="sab-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
-            </div>
-            <span class="sab-title">استيراد البيانات</span>
-        </button>
-
-        <button class="sidebar-action-btn" onclick="exportData()">
-            <div class="sab-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-            </div>
-            <span class="sab-title">تصدير البيانات</span>
-        </button>
-
-        <button class="sidebar-action-btn" onclick="clearData()">
-            <div class="sab-icon" style="background:#fff0f0;">
-                <svg width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    <path d="M10 11v6m4-6v6"/>
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                </svg>
-            </div>
-            <span class="sab-title" style="color:#ef4444;">مسح البيانات</span>
-        </button>
-    </div>
-</nav>
-
-<input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImport(event)">
-<div class="toast" id="appToast"></div>
-
-<!-- Confirm Modal -->
-<div class="confirm-overlay" id="confirmOverlay" onclick="closeConfirm()">
-    <div class="confirm-sheet" onclick="event.stopPropagation()">
-        <div class="confirm-icon">
-            <svg width="26" height="26" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                <path d="M10 11v6m4-6v6"/>
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-            </svg>
-        </div>
-        <div class="confirm-title">مسح البيانات</div>
-        <div class="confirm-subtitle">سيتم حذف جميع بيانات حاسبة الاستهلاك<br>ولا يمكن التراجع عن هذا الإجراء.</div>
-        <div class="confirm-btns">
-            <button class="confirm-btn-danger" onclick="confirmClear()">مسح</button>
-            <button class="confirm-btn-cancel" onclick="closeConfirm()">إلغاء</button>
+        <h2 class="app-title">حاسبة الفواتير</h2>
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tab-elec" onclick="switchToTab('elec')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                الكهرباء
+            </button>
+            <button class="tab-btn" id="tab-water" onclick="switchToTab('water')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 4 10 4 15a8 8 0 0 0 16 0c0-5-8-13-8-13z"/></svg>
+                المياه
+            </button>
         </div>
     </div>
-</div>
 
-<!-- ===================== PAGE: SPEED CALCULATOR ===================== -->
-<div id="page-speed" class="page">
-
-    <div class="main-container">
-
-        <div class="card-header">
-            <div class="header-spacer"></div>
-            <h1>السرعة المناسبة</h1>
-            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
-        </div>
-
-        <div class="section-title">الشاشات والمشاهدة</div>
-
-        <div class="device-row">
-            <div class="device-info">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="3" width="20" height="15" rx="2" ry="2"></rect>
-                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                        <line x1="12" y1="18" x2="12" y2="21"></line>
-                    </svg>
-                </div>
-                <span class="device-name">تلفزيون 4K</span>
-            </div>
-            <div class="stepper">
-                <button class="stepper-btn" onclick="updateValue('tv4k', -1)">-</button>
-                <input type="text" id="tv4k" class="stepper-value" value="0" readonly>
-                <button class="stepper-btn" onclick="updateValue('tv4k', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="device-row">
-            <div class="device-info">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="3" width="20" height="15" rx="2" ry="2"></rect>
-                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                        <line x1="12" y1="18" x2="12" y2="21"></line>
-                    </svg>
-                </div>
-                <span class="device-name">تلفزيون FHD</span>
-            </div>
-            <div class="stepper">
-                <button class="stepper-btn" onclick="updateValue('tvFhd', -1)">-</button>
-                <input type="text" id="tvFhd" class="stepper-value" value="0" readonly>
-                <button class="stepper-btn" onclick="updateValue('tvFhd', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="section-title">الجوالات والأجهزة</div>
-
-        <div class="device-row">
-            <div class="device-info">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                    </svg>
-                </div>
-                <span class="device-name">هاتف رائد QHD</span>
-            </div>
-            <div class="stepper">
-                <button class="stepper-btn" onclick="updateValue('mobileHigh', -1)">-</button>
-                <input type="text" id="mobileHigh" class="stepper-value" value="0" readonly>
-                <button class="stepper-btn" onclick="updateValue('mobileHigh', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="device-row">
-            <div class="device-info">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                    </svg>
-                </div>
-                <span class="device-name">هاتف عادي FHD</span>
-            </div>
-            <div class="stepper">
-                <button class="stepper-btn" onclick="updateValue('mobileNormal', -1)">-</button>
-                <input type="text" id="mobileNormal" class="stepper-value" value="0" readonly>
-                <button class="stepper-btn" onclick="updateValue('mobileNormal', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="section-title">كمبيوتر وألعاب</div>
-
-        <div class="device-row">
-            <div class="device-info">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="12" rx="2" ry="2"></rect>
-                        <line x1="2" y1="20" x2="22" y2="20"></line>
-                    </svg>
-                </div>
-                <span class="device-name">لابتوب</span>
-            </div>
-            <div class="stepper">
-                <button class="stepper-btn" onclick="updateValue('laptops', -1)">-</button>
-                <input type="text" id="laptops" class="stepper-value" value="0" readonly>
-                <button class="stepper-btn" onclick="updateValue('laptops', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="device-row">
-            <div class="device-info">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 12h4m4 0h4m-10-4h4m-2-2v4"></path>
-                        <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                    </svg>
-                </div>
-                <span class="device-name">كونسول (PS/Xbox)</span>
-            </div>
-            <div class="stepper">
-                <button class="stepper-btn" onclick="updateValue('consoles', -1)">-</button>
-                <input type="text" id="consoles" class="stepper-value" value="0" readonly>
-                <button class="stepper-btn" onclick="updateValue('consoles', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="device-row">
-            <div class="device-info">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
-                    </svg>
-                </div>
-                <span class="device-name">ألعاب سحابية</span>
-            </div>
-            <div class="stepper">
-                <button class="stepper-btn" onclick="updateValue('cloudGaming', -1)">-</button>
-                <input type="text" id="cloudGaming" class="stepper-value" value="0" readonly>
-                <button class="stepper-btn" onclick="updateValue('cloudGaming', 1)">+</button>
-            </div>
-        </div>
-
-        <button class="action-btn" onclick="calculateSpeed()">احسب احتياجي</button>
-
-        <div id="result" class="result-panel">
-            <div class="result-label">السرعة المطلوبة:</div>
-            <div class="speed-display" id="speedOutput">0 Mbps</div>
-            <div class="result-details" id="fullSpeedText"></div>
-        </div>
-
-        <div style="height: 1px;"></div>
-    </div>
-</div>
-
-<!-- ===================== PAGE: CONSUMPTION RATE ===================== -->
-<div id="page-usage" class="page active">
-
-    <div class="cons-card">
-        <div class="card-header">
-            <div class="header-spacer"></div>
-            <h1>معدل الاستهلاك</h1>
-            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
-        </div>
-        <div class="cons-row">
-            <div class="cons-group">
-                <label class="cons-label">سعة الاشتراك (GB)</label>
-                <input class="cons-input" type="number" id="capacity">
-            </div>
-            <div class="cons-group">
-                <label class="cons-label">المتبقي حالياً (GB)</label>
-                <input class="cons-input" type="number" id="remaining">
-            </div>
-        </div>
-
-        <div class="cons-row">
-            <div class="cons-group">
-                <label class="cons-label">تاريخ البداية</label>
-                <div class="cons-input-wrap">
-                    <input class="cons-input" type="date" id="startDate">
-                </div>
-            </div>
-            <div class="cons-group">
-                <label class="cons-label">وقت البداية</label>
-                <div class="cons-input-wrap">
-                    <input class="cons-input" type="time" id="startTime">
-                </div>
-            </div>
-        </div>
-
-        <div class="cons-row" style="margin-bottom: 0;">
-            <div class="cons-group">
-                <label class="cons-label">تاريخ الانتهاء</label>
-                <div class="cons-input-wrap">
-                    <input class="cons-input" type="date" id="endDate">
-                </div>
-            </div>
-            <div class="cons-group">
-                <label class="cons-label">وقت الانتهاء</label>
-                <div class="cons-input-wrap">
-                    <input class="cons-input" type="time" id="endTime">
-                </div>
-            </div>
-        </div>
-
-        <button class="cons-btn" onclick="calculateConsumption()">احسب المعدل</button>
-
-        <div class="cons-error" id="consError">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            <span class="cons-error-text" id="consErrorText"></span>
-        </div>
-
-        <div class="cons-result" id="consResult">
-        <div class="cons-main-result">
-            <span class="cons-main-label">معدل الاستهلاك اليومي:</span>
-            <span class="cons-main-value" id="actualDailyRate"></span>
-        </div>
-        <div class="cons-stats">
-            <div class="cons-stat-item">
-                <span class="cons-stat-label">الأيام المنقضية</span>
-                <span class="cons-stat-value" id="daysPassed"></span>
-            </div>
-            <div class="cons-stat-item">
-                <span class="cons-stat-label">كمية الاستهلاك</span>
-                <span class="cons-stat-value" id="consumed"></span>
-            </div>
-            <div class="cons-stat-item" id="luxuryStatusCard">
-                <span class="cons-stat-label">حالة الاستخدام</span>
-                <span class="cons-stat-value" id="luxuryStatus"></span>
-            </div>
-            <div class="cons-stat-item">
-                <span class="cons-stat-label">المعدل للمتبقي</span>
-                <span class="cons-stat-value" id="safeRate"></span>
-            </div>
-        </div>
-    </div>
-    </div>
-
-</div>
-
-
-<script>
-    // ========== EXPORT / IMPORT ==========
-    function exportData() {
-        const keys = ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate','cons_endTime'];
-        const data = {};
-        keys.forEach(k => {
-            const v = localStorage.getItem(k);
-            if (v !== null) data[k] = v;
-        });
-
-        const payload = {
-            app: 'أدوات الإنترنت',
-            version: 1,
-            exportDate: new Date().toISOString(),
-            data
-        };
-
-        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
-        const d    = new Date();
-        const dd   = String(d.getDate()).padStart(2,'0');
-        const mm   = String(d.getMonth()+1).padStart(2,'0');
-        const yy   = d.getFullYear();
-        a.download = `internet tools ${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        closeSidebar();
-        showToast('تم تصدير البيانات');
-    }
-
-    function handleImport(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const payload = JSON.parse(e.target.result);
-                if (!payload.data || typeof payload.data !== 'object') throw new Error('invalid');
-                Object.entries(payload.data).forEach(([k, v]) => localStorage.setItem(k, v));
-                // إعادة تحميل الحقول
-                const fields = ['capacity','remaining','startDate','startTime','endDate','endTime'];
-                fields.forEach(id => {
-                    const val = localStorage.getItem('cons_' + id);
-                    if (val) document.getElementById(id).value = val;
-                });
-                closeSidebar();
-                showToast('تم استيراد البيانات');
-            } catch(err) {
-                showToast('الملف غير صالح');
-            }
-        };
-        reader.readAsText(file);
-        event.target.value = '';
-    }
-
-    function showToast(msg) {
-        const t = document.getElementById('appToast');
-        t.textContent = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2500);
-    }
-
-    function clearData() {
-        closeSidebar();
-        setTimeout(() => {
-            document.getElementById('confirmOverlay').classList.add('active');
-        }, 300);
-    }
-
-    function closeConfirm() {
-        document.getElementById('confirmOverlay').classList.remove('active');
-    }
-
-    function confirmClear() {
-        ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate','cons_endTime'].forEach(k => localStorage.removeItem(k));
-        ['capacity','remaining','startDate','startTime','endDate','endTime'].forEach(id => {
-            document.getElementById(id).value = '';
-        });
-        document.getElementById('consResult').style.display = 'none';
-        hideConsError();
-        closeConfirm();
-        showToast('تم مسح البيانات');
-    }
-
-    // ========== SIDEBAR ==========
-    function openSidebar() {
-        document.getElementById('sidebar').classList.add('open');
-        document.getElementById('sidebarOverlay').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeSidebar() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function navigateTo(page) {
-        // Hide all pages
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
-
-        // Show target page
-        document.getElementById('page-' + page).classList.add('active');
-        document.getElementById('nav-' + page).classList.add('active-nav');
-
-        closeSidebar();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        history.replaceState(null, '', '#' + page);
-    }
-
-    // Navigate to hash on load
-    const validPages = ['usage', 'speed', 'speedtest', 'streaming', 'bitrate'];
-    document.addEventListener('DOMContentLoaded', function() {
-        const hash = location.hash.replace('#', '');
-        if (validPages.includes(hash)) navigateTo(hash);
-    });
-
-    // ========== SPEED TEST ==========
-    let sptRunning = false;
-    let sptAborted = false;
-    let sptTotalDownBytes = 0;
-    let sptTotalUpBytes = 0;
-
-    function toggleSptData() {
-        const row = document.getElementById('sptDataRow');
-        if (sptTotalDownBytes === 0 && sptTotalUpBytes === 0) return;
-        row.classList.toggle('visible');
-    }
-
-    async function runSpeedTest() {
-        if (sptRunning) {
-            sptAborted = true;
-            return;
-        }
-        sptRunning = true;
-        sptAborted = false;
-
-        const btn = document.getElementById('sptBtn');
-        btn.disabled = false;
-        btn.textContent = 'إيقاف';
-        btn.onclick = () => { sptAborted = true; };
-
-        setSptDisplay('—', '');
-        setSptStatus('جاهز' + dots());
-        setSptArc(0);
-        ['sptPing','sptDown','sptUp'].forEach(id => document.getElementById(id).textContent = '—');
-        document.getElementById('sptDataRow').classList.remove('visible');
-        sptTotalDownBytes = 0;
-        sptTotalUpBytes = 0;
-        document.getElementById('sptJitter').textContent = '—';
-
-        try {
-            setSptStatus('جاري الاختبار' + dots());
-            const ping = await sptMeasurePing();
-            if (sptAborted) throw new Error('aborted');
-            document.getElementById('sptPing').textContent = ping;
-
-            setSptStatus('قياس التنزيل' + dots());
-            const down = await sptMeasureDownload();
-            if (sptAborted) throw new Error('aborted');
-            document.getElementById('sptDown').textContent = down;
-            setSptDisplay(down, 'Mbps');
-
-            setSptStatus('قياس الرفع' + dots());
-            const up = await sptMeasureUpload();
-            if (sptAborted) throw new Error('aborted');
-            document.getElementById('sptUp').textContent = up;
-
-            setSptDisplay(down, 'Mbps');
-            setSptArc(parseFloat(down) / 200);
-            setSptStatus('اكتمل الاختبار <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;background:var(--accent-color);border-radius:50%;vertical-align:middle;position:relative;top:-1px;margin-right:4.5px"><svg width="8" height="8" viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>');
-        } catch(e) {
-            if (e.message === 'aborted') {
-                setSptStatus('تم إيقاف الاختبار');
-                setSptDisplay('—', '');
-                setSptArc(0);
-            } else {
-                setSptStatus('تعذّر الاتصال، تحقق من اتصالك');
-                setSptDisplay('!', '');
-            }
-        }
-
-        btn.textContent = 'ابدأ الاختبار';
-        btn.onclick = () => runSpeedTest();
-        sptRunning = false;
-        sptAborted = false;
-    }
-
-    async function sptMeasurePing() {
-        const times = [];
-        for (let i = 0; i < 8; i++) {
-            const t = Date.now();
-            await fetch('https://speed.cloudflare.com/__down?bytes=0', { cache: 'no-store' });
-            times.push(Date.now() - t);
-        }
-        const diffs = [];
-        for (let i = 1; i < times.length; i++) {
-            diffs.push(Math.abs(times[i] - times[i - 1]));
-        }
-        const jitter = (diffs.reduce((a, b) => a + b, 0) / diffs.length).toFixed(0);
-        document.getElementById('sptJitter').textContent = jitter;
-        return Math.min(...times);
-    }
-
-    async function sptMeasureDownload() {
-        const DURATION = 15000;
-        const CHUNK = 5000000;
-        let totalBytes = 0;
-        const start = Date.now();
-        while (Date.now() - start < DURATION) {
-            if (sptAborted) break;
-            const r = await fetch(`https://speed.cloudflare.com/__down?bytes=${CHUNK}`, { cache: 'no-store' });
-            await r.arrayBuffer();
-            totalBytes += CHUNK;
-            const elapsed = (Date.now() - start) / 1000;
-            const mbps = ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
-            setSptDisplay(mbps, 'Mbps');
-            setSptArc(parseFloat(mbps) / 200);
-        }
-        sptTotalDownBytes = totalBytes;
-        document.getElementById('sptDownBytes').textContent = (totalBytes / 1000000).toFixed(1);
-        const elapsed = (Date.now() - start) / 1000;
-        return ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
-    }
-
-    async function sptMeasureUpload() {
-        const DURATION = 15000;
-        const CHUNK = 5000000;
-        let totalBytes = 0;
-        const start = Date.now();
-        while (Date.now() - start < DURATION) {
-            if (sptAborted) break;
-            const data = new Uint8Array(CHUNK);
-            await fetch('https://speed.cloudflare.com/__up', {
-                method: 'POST', body: data, cache: 'no-store'
-            });
-            totalBytes += CHUNK;
-            const elapsed = (Date.now() - start) / 1000;
-            const mbps = ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
-            setSptDisplay(mbps, 'Mbps');
-            setSptArc(parseFloat(mbps) / 200);
-        }
-        sptTotalUpBytes = totalBytes;
-        document.getElementById('sptUpBytes').textContent = (totalBytes / 1000000).toFixed(1);
-        const elapsed = (Date.now() - start) / 1000;
-        return ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
-    }
-
-    function setSptDisplay(val, unit) {
-        document.getElementById('sptCurrentValue').textContent = val;
-        document.getElementById('sptCurrentUnit').textContent = unit;
-    }
-    function dots() {
-        return '<span class="spt-dot">.</span><span class="spt-dot">.</span><span class="spt-dot">.</span>';
-    }
-    function setSptStatus(txt) {
-        const el = document.getElementById('sptStatus');
-        el.classList.add('fade-update');
-        setTimeout(() => {
-            el.innerHTML = txt;
-            el.classList.remove('fade-update');
-        }, 300);
-    }
-    function setSptArc(pct) {
-        const circ = 452.4;
-        document.getElementById('sptArc').style.strokeDashoffset = circ * (1 - Math.min(pct, 1));
-    }
-
-    // ========== SPEED CALCULATOR ==========
-    function updateValue(id, change) {
-        let input = document.getElementById(id);
-        let val = parseInt(input.value) || 0;
-        let newVal = val + change;
-        if (newVal < 0) newVal = 0;
-        input.value = newVal;
-    }
-
-    function calculateSpeed() {
-        const SPEED_RATES = {
-            tv4k: 25, tvFhd: 15, mobileHigh: 20,
-            mobileNormal: 10, laptops: 15, consoles: 15, cloudGaming: 35
-        };
-
-        let tv4k        = parseInt(document.getElementById('tv4k').value) || 0;
-        let tvFhd       = parseInt(document.getElementById('tvFhd').value) || 0;
-        let mobileHigh  = parseInt(document.getElementById('mobileHigh').value) || 0;
-        let mobileNormal= parseInt(document.getElementById('mobileNormal').value) || 0;
-        let laptops     = parseInt(document.getElementById('laptops').value) || 0;
-        let consoles    = parseInt(document.getElementById('consoles').value) || 0;
-        let cloudGaming = parseInt(document.getElementById('cloudGaming').value) || 0;
-
-        let rawTotal = (tv4k * SPEED_RATES.tv4k) + (tvFhd * SPEED_RATES.tvFhd) +
-                       (mobileHigh * SPEED_RATES.mobileHigh) + (mobileNormal * SPEED_RATES.mobileNormal) +
-                       (laptops * SPEED_RATES.laptops) + (consoles * SPEED_RATES.consoles) +
-                       (cloudGaming * SPEED_RATES.cloudGaming);
-
-        let peakTotal = Math.ceil(rawTotal * 1.0);
-        let resBox = document.getElementById('result');
-        let capsule = document.getElementById('fullSpeedText');
-
-        resBox.style.display = 'flex';
-        document.getElementById('speedOutput').innerText = peakTotal + " Mbps";
-
-        if (rawTotal > 0) {
-            capsule.style.display = 'inline-flex';
-            let rec = "";
-            if (peakTotal <= 75) {
-                rec = "أقرب اشتراك متوفر حالياً <b>100 ميجا</b>";
-            } else if (peakTotal <= 175) {
-                rec = "أقرب اشتراك متوفر حالياً <b>200 ميجا</b>";
-            } else if (peakTotal <= 275) {
-                rec = "أقرب اشتراك متوفر حالياً <b>300 ميجا</b>";
-            } else {
-                rec = "أقرب اشتراك متوفر حالياً <b>500 ميجا</b> أو أعلى";
-            }
-            capsule.innerHTML = rec;
-        } else {
-            capsule.style.display = 'none';
-            capsule.innerHTML = "";
-        }
-
-        setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-    }
-
-    // ========== LOAD FROM LOCALSTORAGE ==========
-    window.addEventListener('load', function() {
-        ['capacity','remaining','startDate','startTime','endDate','endTime'].forEach(id => {
-            const val = localStorage.getItem('cons_' + id);
-            if (val) document.getElementById(id).value = val;
-        });
-    });
-
-    function showConsError(msg) {
-        const el = document.getElementById('consError');
-        document.getElementById('consErrorText').textContent = msg;
-        el.classList.add('show');
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    function hideConsError() {
-        document.getElementById('consError').classList.remove('show');
-    }
-
-    // ========== BITRATE CALCULATOR ==========
-    let brUnit = 'MB';
-
-    function toggleBrUnit() {
-        if (brUnit === 'MB') {
-            brUnit = 'GB';
-            document.getElementById('brSizeUnitLabel').textContent = 'جيجابايت';
-        } else {
-            brUnit = 'MB';
-            document.getElementById('brSizeUnitLabel').textContent = 'ميجابايت';
-        }
-    }
-
-    function calculateBitrate() {
-        const size = parseFloat(document.getElementById('brFileSize').value) || 0;
-        const unit = brUnit;
-        const hours   = parseInt(document.getElementById('brHours').value)   || 0;
-        const minutes = parseInt(document.getElementById('brMinutes').value) || 0;
-        const seconds = parseInt(document.getElementById('brSeconds').value) || 0;
-
-        const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
-        const resultEl = document.getElementById('brResult');
-
-        if (size === 0 || totalSeconds === 0) {
-            resultEl.style.display = 'none';
-            return;
-        }
-
-        const sizeInMB     = unit === 'GB' ? size * 1024 : size;
-        const sizeInKbits  = sizeInMB * 8192;
-        const bitrateKbps  = sizeInKbits / totalSeconds;
-        const bitrateMbps  = bitrateKbps / 1000;
-
-        document.getElementById('brKbps').textContent = Math.round(bitrateKbps);
-        document.getElementById('brMbps').textContent = bitrateMbps.toFixed(1);
-        resultEl.style.display = 'block';
-    }
-
-    function calculateConsumption() {
-        const capInput      = document.getElementById('capacity').value;
-        const remInput      = document.getElementById('remaining').value;
-        const startDateVal  = document.getElementById('startDate').value;
-        const startTimeVal  = document.getElementById('startTime').value;
-        const endDateVal    = document.getElementById('endDate').value;
-        const endTimeVal    = document.getElementById('endTime').value;
-
-        const startTime = startTimeVal || '00:00';
-        const endTime   = endTimeVal   || '23:59';
-
-        if (!capInput || isNaN(parseFloat(remInput)) || !startDateVal || !endDateVal) {
-            showConsError("يرجى ملء كافة الخانات"); return;
-        }
-
-        localStorage.setItem('cons_capacity',  capInput);
-        localStorage.setItem('cons_remaining', remInput);
-        localStorage.setItem('cons_startDate', startDateVal);
-        localStorage.setItem('cons_startTime', startTimeVal);
-        localStorage.setItem('cons_endDate',   endDateVal);
-        localStorage.setItem('cons_endTime',   endTimeVal);
-
-        const start = new Date(`${startDateVal}T${startTime}`);
-        const end   = new Date(`${endDateVal}T${endTime}`);
-        const now   = new Date();
-
-        if (now < start) { showConsError("تاريخ البداية يجب أن يكون في الماضي"); return; }
-        if (end <= now)  { showConsError("تاريخ الانتهاء يجب أن يكون في المستقبل"); return; }
-
-        hideConsError();
-
-        const cap       = parseFloat(capInput);
-        const rem       = parseFloat(remInput);
-        const consumed  = cap - rem;
-        const daysPassed = (now - start) / (1000 * 60 * 60 * 24);
-        const daysLeft   = (end - now)   / (1000 * 60 * 60 * 24);
-
-        const actualDailyRate = consumed / daysPassed;
-        const safeRate        = Math.min(rem / daysLeft, rem);
-
-        const totalMinutes = Math.floor((now - start) / (1000 * 60));
-        const d = Math.floor(totalMinutes / 1440);
-        const h = Math.floor((totalMinutes % 1440) / 60);
-        const m = totalMinutes % 60;
-        const daysLabel = d;
-
-        document.getElementById('actualDailyRate').innerText = actualDailyRate.toFixed(2) + " GB";
-        document.getElementById('daysPassed').innerText     = daysLabel;
-        document.getElementById('consumed').innerText       = consumed.toFixed(2) + " GB";
-        document.getElementById('safeRate').innerText       = safeRate.toFixed(2) + " GB";
-
-        // ===== حالة الاستخدام =====
-        const luxuryCard = document.getElementById('luxuryStatusCard');
-        const luxuryEl   = document.getElementById('luxuryStatus');
-
-        if (safeRate < actualDailyRate) {
-            luxuryEl.innerHTML = '<span style="font-size:0.95rem;position:relative;top:-2px">خطر</span>';
-        } else if (safeRate < 2 * actualDailyRate) {
-            const daysToLuxury = Math.ceil(2 * daysLeft - rem / actualDailyRate);
-            const dtWord = daysToLuxury >= 3 && daysToLuxury <= 10 ? 'أيام' : 'يوم';
-            luxuryEl.innerHTML = daysToLuxury + ' <span style="font-size:0.95rem">' + dtWord + '</span>';
-        } else {
-            luxuryEl.innerHTML = '<span style="font-size:0.95rem;position:relative;top:-2px">وفير</span>';
-        }
-
-        const resultEl = document.getElementById('consResult');
-        resultEl.style.display = 'block';
-    }
-
-    // ========== STREAMING CALCULATOR ==========
-    let streamUnit = 'Mbps';
-
-    function toggleStreamUnit() {
-        streamUnit = streamUnit === 'Mbps' ? 'Kbps' : 'Mbps';
-        document.getElementById('streamSpeedUnitLabel').textContent = streamUnit;
-        document.getElementById('streamSpeed').value = '';
-        document.getElementById('streamResult').style.display = 'none';
-    }
-
-    function calculateStreaming() {
-        const speedVal  = parseFloat(document.getElementById('streamSpeed').value);
-        const hours     = parseInt(document.getElementById('streamHours').value)   || 0;
-        const minutes   = parseInt(document.getElementById('streamMinutes').value) || 0;
-        const seconds   = parseInt(document.getElementById('streamSeconds').value) || 0;
-
-        const errEl   = document.getElementById('streamError');
-        const errText = document.getElementById('streamErrorText');
-
-        if (isNaN(speedVal) || speedVal <= 0) {
-            errText.textContent = 'يرجى إدخال معدل البت';
-            errEl.classList.add('show');
-            return;
-        }
-        if (hours === 0 && minutes === 0 && seconds === 0) {
-            errText.textContent = 'يرجى إدخال مدة البث';
-            errEl.classList.add('show');
-            return;
-        }
-        errEl.classList.remove('show');
-
-        const speed      = streamUnit === 'Mbps' ? speedVal : speedVal / 1000;
-        const speedLabel = speedVal + ' ' + streamUnit;
-
-        // speed(Mbps) × totalSeconds ÷ 8 ÷ 1000 = GB
-        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-        const gbRaw = speed * totalSeconds / 8 / 1000;
-
-        let displayValue, displayUnit;
-        if (gbRaw < 1) {
-            displayValue = (gbRaw * 1000).toFixed(2);
-            displayUnit  = 'MB';
-        } else {
-            displayValue = gbRaw.toFixed(2);
-            displayUnit  = 'GB';
-        }
-
-        document.getElementById('streamResultValue').textContent = displayValue;
-        document.getElementById('streamResultUnit').textContent  = displayUnit;
-        document.getElementById('streamResultSpeed').textContent = speedLabel;
-
-        const resultEl = document.getElementById('streamResult');
-        resultEl.style.display = 'block';
-    }
-</script>
-
-<!-- ===================== PAGE: SPEED TEST ===================== -->
-<div id="page-speedtest" class="page">
-    <div class="cons-card">
-        <div class="card-header">
-            <div class="header-spacer"></div>
-            <h1>قياس السرعة</h1>
-            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
-        </div>
-
-        <div class="spt-gauge-wrap">
-            <div class="spt-gauge">
-                <svg viewBox="0 0 170 170">
-                    <defs>
-                        <linearGradient id="sptGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#4f46e5"/>
-                            <stop offset="100%" stop-color="#7c3aed"/>
-                        </linearGradient>
-                    </defs>
-                    <circle class="spt-track" cx="85" cy="85" r="72"/>
-                    <circle class="spt-arc" id="sptArc" cx="85" cy="85" r="72"/>
-                </svg>
-                <div class="spt-center">
-                    <span class="spt-val" id="sptCurrentValue">—</span>
-                    <span class="spt-unit-lbl" id="sptCurrentUnit"></span>
-                </div>
-            </div>
-            <div class="spt-status-txt" id="sptStatus">جاهز للاختبار</div>
-        </div>
-
-        <div class="spt-metrics" onclick="toggleSptData()">
-            <div class="spt-metric">
-                <span class="spt-metric-label">التنزيل</span>
-                <span class="spt-metric-val" id="sptDown">—</span>
-                <span class="spt-metric-unit">Mbps</span>
-            </div>
-            <div class="spt-metric">
-                <span class="spt-metric-label">الرفع</span>
-                <span class="spt-metric-val" id="sptUp">—</span>
-                <span class="spt-metric-unit">Mbps</span>
-            </div>
-            <div class="spt-metric">
-                <span class="spt-metric-label">الاستجابة</span>
-                <span class="spt-metric-val" id="sptPing">—</span>
-                <span class="spt-metric-unit">ms</span>
-            </div>
-        </div>
-
-        <div class="spt-data-row" id="sptDataRow">
-            <div class="spt-metric">
-                <span class="spt-metric-label">التنزيل</span>
-                <span class="spt-metric-val" id="sptDownBytes">—</span>
-                <span class="spt-metric-unit">MB</span>
-            </div>
-            <div class="spt-metric">
-                <span class="spt-metric-label">الرفع</span>
-                <span class="spt-metric-val" id="sptUpBytes">—</span>
-                <span class="spt-metric-unit">MB</span>
-            </div>
-            <div class="spt-metric">
-                <span class="spt-metric-label">التذبذب</span>
-                <span class="spt-metric-val" id="sptJitter">—</span>
-                <span class="spt-metric-unit">ms</span>
-            </div>
-        </div>
-
-        <button class="cons-btn" id="sptBtn" onclick="runSpeedTest()">ابدأ الاختبار</button>
-    </div>
-</div>
-
-<!-- ===================== PAGE: STREAMING CALCULATOR ===================== -->
-<div id="page-streaming" class="page">
-    <div class="cons-card">
-        <div class="card-header">
-            <div class="header-spacer"></div>
-            <h1>حاسبة البث المباشر</h1>
-            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
-        </div>
-
-        <div class="stream-input-group">
-            <div class="bitrate-group" style="margin-bottom:0;">
-                <label class="cons-label">معدل البت</label>
-                <div class="bitrate-size-row">
-                    <input class="cons-input" type="number" id="streamSpeed" inputmode="decimal" step="any" min="0">
-                    <button type="button" class="bitrate-unit-toggle" onclick="toggleStreamUnit()">
-                        <span id="streamSpeedUnitLabel">Mbps</span>
-                    </button>
-                </div>
-            </div>
-
-            <div>
-                <label class="cons-label" style="text-align:right; margin-bottom:8px;">مدة البث</label>
-                <div class="stream-duration-row">
-                    <div class="bitrate-time-item">
-                        <input class="cons-input" type="number" id="streamSeconds" inputmode="numeric" min="0" max="59">
-                        <span class="bitrate-time-label">ثواني</span>
+    <!-- ===== قسم الكهرباء ===== -->
+    <div id="section-elec">
+        <div class="card">
+            <div class="input-group">
+                <div class="readings-container" id="e-readings-container">
+                    <div class="reading-input">
+                        <label for="e-previous-reading">القراءة السابقة</label>
+                        <input type="number" id="e-previous-reading" class="e-enter-next">
                     </div>
-                    <div class="bitrate-time-item">
-                        <input class="cons-input" type="number" id="streamMinutes" inputmode="numeric" min="0" max="59">
-                        <span class="bitrate-time-label">دقائق</span>
+                    <div class="reading-input">
+                        <label for="e-current-reading">القراءة الحالية</label>
+                        <input type="number" id="e-current-reading" class="e-enter-next">
                     </div>
-                    <div class="bitrate-time-item">
-                        <input class="cons-input" type="number" id="streamHours" inputmode="numeric" min="0">
-                        <span class="bitrate-time-label">ساعات</span>
+                </div>
+                <div id="e-consumption-container" style="display:none;margin-bottom:15px;">
+                    <label for="e-direct-consumption" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:4px;padding-right:4px;font-weight:500;">كمية الاستهلاك</label>
+                    <input type="number" id="e-direct-consumption" style="width:100%;height:var(--standard-height);padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1.05rem;font-weight:600;text-align:center;background:#fdfdfd;" min="0">
+                </div>
+                <div class="extra-inputs">
+                    <div style="flex:1;">
+                        <label>تاريخ الفاتورة السابقة</label>
+                        <input type="text" id="e-reading-day" placeholder="" inputmode="numeric" pattern="\d*" class="e-enter-next" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div class="waste-input-wrapper">
+                        <label for="e-waste-fee">رسوم النفايات</label>
+                        <input type="number" id="e-waste-fee" value="3" class="e-enter-next">
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="stream-error" id="streamError">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            <span class="stream-error-text" id="streamErrorText"></span>
-        </div>
-
-        <button class="cons-btn" onclick="calculateStreaming()">احسب الاستهلاك</button>
-
-        <div class="stream-result" id="streamResult">
-            <span class="stream-result-label">إجمالي الاستهلاك المتوقع</span>
-            <span class="stream-result-number-line">
-                <span class="stream-result-value" id="streamResultValue">0</span>
-                <span class="stream-result-unit" id="streamResultUnit">GB</span>
-            </span>
-            <div class="stream-result-sub">
-                <div class="stream-sub-pill">معدل البت: <b id="streamResultSpeed" style="direction:ltr;display:inline-block;">—</b></div>
+            <div class="radio-group">
+                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع الاشتراك</label>
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="e-sub-supported" name="e-subscription-type" value="supported" checked>
+                        <label for="e-sub-supported">مدعوم</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="e-sub-unsupported" name="e-subscription-type" value="unsupported">
+                        <label for="e-sub-unsupported">غير مدعوم</label>
+                    </div>
+                </div>
             </div>
+
+            <div class="radio-group">
+                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">نوع العداد</label>
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="e-phase-1" name="e-meter-phase" value="1" checked>
+                        <label for="e-phase-1"><span style="transform:translateY(2px);display:inline-block">1 فاز</span></label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="e-phase-3" name="e-meter-phase" value="3">
+                        <label for="e-phase-3"><span style="transform:translateY(2px);display:inline-block">3 فاز</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="calculate-btn" onclick="elec_calculateAndSave()">احسب القيمة</button>
+        </div>
+    </div>
+
+    <!-- ===== قسم المياه ===== -->
+    <div id="section-water" style="display:none">
+        <div class="card">
+            <div class="input-group">
+                <div class="readings-container" id="w-readings-container">
+                    <div class="reading-input">
+                        <label for="w-previous-reading">القراءة السابقة</label>
+                        <input type="number" id="w-previous-reading" class="w-hide-kb" step="1" min="0">
+                    </div>
+                    <div class="reading-input">
+                        <label for="w-current-reading">القراءة الحالية</label>
+                        <input type="number" id="w-current-reading" class="w-hide-kb" step="1" min="0">
+                    </div>
+                </div>
+                <div id="w-consumption-container" style="display:none;margin-bottom:15px;">
+                    <label for="w-direct-consumption" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:4px;padding-right:4px;font-weight:500;">كمية الاستهلاك</label>
+                    <input type="number" id="w-direct-consumption" class="w-hide-kb" style="width:100%;height:var(--standard-height);padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1.05rem;font-weight:600;text-align:center;background:#fdfdfd;" step="1" min="0">
+                </div>
+
+            </div>
+
+            <div class="radio-group">
+                <label style="font-size:0.94rem;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:500;">مخدوم بالصرف الصحي</label>
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="w-sewer-yes" name="w-sewer-service" value="yes" checked>
+                        <label for="w-sewer-yes">نعم</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="w-sewer-no" name="w-sewer-service" value="no">
+                        <label for="w-sewer-no">لا</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="calculate-btn" onclick="water_runCalculation()">احسب القيمة</button>
+        </div>
+    </div>
+
+</div><!-- end content-wrapper -->
+
+<div id="result-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div id="modal-results-content"></div>
+    </div>
+</div>
+
+<footer class="simple-footer">
+    طوّر بواسطة <a href="https://github.com/iofahmawi" target="_blank" rel="noopener noreferrer">iofahmawi</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<input type="file" id="drawer-import-input" accept=".json" onchange="drawerImportFile(event)">
+
+<!-- نافذة تأكيد المسح -->
+<div id="rollover-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+    <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
+        <div style="width:52px;height:52px;background:#ede9fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </div>
+        <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">ترحيل الدورة</p>
+        <p style="font-size:0.94rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">تنقل القراءة الحالية إلى السابقة وتمسح الحالية، تُستخدم عند بداية دورة فاتورة جديدة</p>
+        <div style="display:flex;gap:10px;">
+            <button id="rollover-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+            <button id="rollover-confirm" style="flex:1;height:42px;border:none;background:#7c3aed;border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">ترحيل</button>
         </div>
     </div>
 </div>
 
-<!-- ===================== PAGE: BITRATE CALCULATOR ===================== -->
-<div id="page-bitrate" class="page">
-    <div class="cons-card">
-        <div class="card-header">
-            <div class="header-spacer"></div>
-            <h1>حاسبة معدل البت</h1>
-            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
+<div id="clear-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+    <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
+        <div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
         </div>
-
-        <div class="bitrate-group">
-            <label class="cons-label">حجم الملف</label>
-            <div class="bitrate-size-row">
-                <input class="cons-input" type="number" id="brFileSize" inputmode="decimal" step="any" min="0">
-                <button type="button" class="bitrate-unit-toggle" onclick="toggleBrUnit()">
-                    <span id="brSizeUnitLabel">ميجابايت</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="bitrate-group">
-            <label class="cons-label">مدة الفيديو</label>
-            <div class="bitrate-time-grid">
-                <div class="bitrate-time-item">
-                    <input class="cons-input" type="number" id="brSeconds" inputmode="numeric" min="0" max="59">
-                    <span class="bitrate-time-label">ثواني</span>
-                </div>
-                <div class="bitrate-time-item">
-                    <input class="cons-input" type="number" id="brMinutes" inputmode="numeric" min="0" max="59">
-                    <span class="bitrate-time-label">دقائق</span>
-                </div>
-                <div class="bitrate-time-item">
-                    <input class="cons-input" type="number" id="brHours" inputmode="numeric" min="0">
-                    <span class="bitrate-time-label">ساعات</span>
-                </div>
-            </div>
-        </div>
-
-        <button class="cons-btn" onclick="calculateBitrate()">احسب معدل البت</button>
-
-        <div class="bitrate-result" id="brResult">
-            <span class="stream-result-label">معدل البت المقدر</span>
-            <span class="stream-result-number-line">
-                <span class="stream-result-value" id="brKbps">0</span>
-                <span class="stream-result-unit">kbps</span>
-            </span>
-            <div class="stream-result-sub">
-                <div class="stream-sub-pill">المعدل بالميجابت: <span style="direction:ltr;display:inline-flex;align-items:center;gap:3px;color:var(--accent-color);"><b id="brMbps">0.0</b><span>Mbps</span></span></div>
-            </div>
+        <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">مسح البيانات</p>
+        <p style="font-size:0.94rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">سيتم حذف جميع البيانات المحفوظة بشكل نهائي</p>
+        <div style="display:flex;gap:10px;">
+            <button id="clear-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+            <button id="clear-confirm" style="flex:1;height:42px;border:none;background:var(--error-red);border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">مسح</button>
         </div>
     </div>
 </div>
 
 <script>
-  if ('serviceWorker' in navigator) {
+
+// =============================================
+// أسعار افتراضية (fallback إذا لم يتوفر prices.json)
+// =============================================
+const FALLBACK_PRICES = {
+    "elec": {
+        "supported":   [[300, 0.05], [600, 0.10], [999999, 0.20]],
+        "unsupported": [[1000, 0.12], [999999, 0.15]],
+        "support":     [[51, 200, 2.5], [201, 600, 2.0]],
+        "tv":     1.0,
+        "meter1": 0.20,
+        "meter3": 0.50
+    },
+    "water": {
+        "tariffs":   [[6, 0.60, 0.15], [6, 0.80, 0.50], [6, 1.10, 0.70], [6, 1.40, 0.85], [12, 1.80, 0.95]],
+        "base":      2.50,
+        "baseSewer": 0.23,
+        "overflow":  [2.20, 1.20]
+    }
+};
+
+let PRICES = { ...FALLBACK_PRICES };
+
+async function loadPrices() {
+    try {
+        const res = await fetch('prices.json?v=' + Date.now());
+        if (!res.ok) throw new Error('prices.json not ok');
+        const data = await res.json();
+        const year = new Date().getFullYear().toString();
+        const found = data[year] || data[Object.keys(data).sort().pop()];
+        if (found) {
+            PRICES = found;
+        }
+    } catch(e) {
+        console.warn('prices.json غير متاح، يُستخدم الأسعار الافتراضية');
+        PRICES = { ...FALLBACK_PRICES };
+    }
+}
+
+// =============================================
+// التبديل بين الحاسبتين
+// =============================================
+let activeCalc = 'elec';
+
+function switchToTab(tab) {
+    activeCalc = tab;
+    document.getElementById('section-elec').style.display  = tab === 'elec'  ? 'block' : 'none';
+    document.getElementById('section-water').style.display = tab === 'water' ? 'block' : 'none';
+    document.getElementById('tab-elec').classList.toggle('active',  tab === 'elec');
+    document.getElementById('tab-water').classList.toggle('active', tab === 'water');
+}
+
+// للتوافق مع أي استدعاء قديم
+function switchCalc() { switchToTab(activeCalc === 'elec' ? 'water' : 'elec'); }
+
+// =============================================
+// مشترك
+// =============================================
+function formatNumber(num) { return parseFloat(num).toString(); }
+function elec_fmt(num)  { return formatNumber(num.toFixed(3)); }
+function water_fmt(num) { return formatNumber(num.toFixed(2)); }
+
+function showModal(html, downloadName) {
+    const modal = document.getElementById('result-modal');
+    const modalContentDiv = document.getElementById('modal-results-content');
+    modalContentDiv.innerHTML = html;
+    modal.style.display = 'flex';
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.querySelector('.modal-content').ondblclick = (event) => {
+        event.stopPropagation();
+        const el = document.querySelector('.modal-content');
+        const prevMaxHeight = el.style.maxHeight;
+        const prevOverflow = el.style.overflowY;
+        el.style.maxHeight = 'none';
+        el.style.overflowY = 'visible';
+        html2canvas(el, { scale: window.devicePixelRatio * 3, useCORS: true }).then(canvas => {
+            el.style.maxHeight = prevMaxHeight;
+            el.style.overflowY = prevOverflow;
+            const link = document.createElement('a');
+            const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+            link.download = `${downloadName}-${today}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    };
+}
+
+// =============================================
+// حاسبة الكهرباء
+// =============================================
+
+// ترتيب الحقول للانتقال بـ Enter
+const elec_fieldIds = ['e-current-reading', 'e-previous-reading', 'e-reading-day', 'e-waste-fee'];
+document.querySelectorAll('.e-enter-next').forEach(input => {
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const idx = elec_fieldIds.indexOf(this.id);
+            if (idx !== -1 && idx < elec_fieldIds.length - 1) {
+                document.getElementById(elec_fieldIds[idx + 1]).focus();
+            } else {
+                this.blur();
+            }
+        }
+    });
+});
+
+function convertToYMD(input) {
+    let val = input.value.trim().replace(/\s+/g, '');
+    if (!val) return;
+    let day, month, year, m;
+    const ddmmyyyy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/;
+    const yyyymmdd = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+    if ((m = val.match(ddmmyyyy))) {
+        day = m[1].padStart(2, '0');
+        month = m[2].padStart(2, '0');
+        year = m[3];
+    } else if ((m = val.match(yyyymmdd))) {
+        year = m[1];
+        month = m[2].padStart(2, '0');
+        day = m[3].padStart(2, '0');
+    } else {
+        return;
+    }
+    input.dataset.value = `${year}-${month}-${day}`;
+    input.value = `${year}-${month}-${day}`;
+}
+
+document.getElementById('e-reading-day').addEventListener('blur', function() {
+    convertToYMD(this);
+});
+
+
+function getFullCost(cons, subType, waste, phase) {
+    let energyCost = 0, remaining = cons, acc = 0;
+    const tariffs = subType === 'supported' ? PRICES.elec.supported : PRICES.elec.unsupported;
+    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
+        const [limit, price] = tariffs[i];
+        const size = limit >= 999999 ? Infinity : (limit - acc);
+        const used = Math.min(remaining, size);
+        energyCost += used * price;
+        remaining -= used;
+        acc += used;
+    }
+    let support = 0;
+    if (subType === 'supported') {
+        for (const [from, to, val] of PRICES.elec.support) {
+            if (cons >= from && cons <= to) { support = val; break; }
+        }
+    }
+    const meterFee = (phase == 3) ? PRICES.elec.meter3 : PRICES.elec.meter1;
+    const fixedFees = waste + PRICES.elec.tv + meterFee + (cons / 1000);
+    return (energyCost + fixedFees) - support;
+}
+
+function elec_calculateAndSave() {
+    if (document.activeElement) document.activeElement.blur();
+    const success = calculateElectricBill();
+    if (success) {
+        if (!consumptionMode) {
+            localStorage.setItem('calculator_currentReading', document.getElementById('e-current-reading').value);
+            localStorage.setItem('calculator_previousReading', document.getElementById('e-previous-reading').value);
+        }
+        localStorage.setItem('calculator_day', document.getElementById('e-reading-day').dataset.value || document.getElementById('e-reading-day').value);
+        localStorage.setItem('calculator_waste', document.getElementById('e-waste-fee').value);
+        localStorage.setItem('calculator_phase', document.querySelector('input[name="e-meter-phase"]:checked').value);
+        localStorage.setItem('calculator_subscriptionType', document.querySelector('input[name="e-subscription-type"]:checked').value);
+    }
+}
+
+function calculateElectricBill() {
+    const currentReadingInput    = document.getElementById('e-current-reading');
+    const previousReadingInput   = document.getElementById('e-previous-reading');
+    const readingDayInput        = document.getElementById('e-reading-day');
+    const wasteInput             = document.getElementById('e-waste-fee');
+    const phaseInput             = document.querySelector('input[name="e-meter-phase"]:checked');
+    const subscriptionTypeInput  = document.querySelector('input[name="e-subscription-type"]:checked');
+
+    const currentReadingValue  = currentReadingInput.value.trim();
+    const previousReadingValue = previousReadingInput.value.trim();
+    const readingDayValue      = readingDayInput.value.trim() ? (readingDayInput.dataset.value || readingDayInput.value).trim() : '';
+    const wasteFeeValue        = wasteInput.value.trim() === "" ? 3 : parseFloat(wasteInput.value);
+    const phaseValue           = parseInt(phaseInput.value);
+
+    let consumption;
+    const subscriptionType = subscriptionTypeInput.value;
+
+    if (consumptionMode) {
+        const directVal = document.getElementById('e-direct-consumption').value.trim();
+        if (directVal === '') {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'فاتورة-الكهرباء');
+            return false;
+        }
+        consumption = parseFloat(directVal);
+        if (isNaN(consumption) || consumption < 0) {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'فاتورة-الكهرباء');
+            return false;
+        }
+    } else {
+        if (currentReadingValue === '') {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>', 'فاتورة-الكهرباء');
+            return false;
+        }
+        const currentReading  = parseFloat(currentReadingValue);
+        const prevExists      = (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
+        const previousReading = prevExists ? parseFloat(previousReadingValue) : 0;
+        consumption = currentReading - previousReading;
+        if (consumption < 0) {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>', 'فاتورة-الكهرباء');
+            return false;
+        }
+    }
+    const hasPrevious = !consumptionMode && (previousReadingValue !== '' && parseFloat(previousReadingValue) >= 0);
+
+    let avgDivHtml = "";
+    if (hasPrevious && readingDayValue !== "") {
+        const dateParts = readingDayValue.split("-");
+        if (dateParts.length === 3) {
+            const y = parseInt(dateParts[0], 10);
+            const m = parseInt(dateParts[1], 10) - 1;
+            const d = parseInt(dateParts[2], 10);
+            const startDate = new Date(y, m, d, 9, 0, 0, 0);
+            const now = new Date();
+            const diffMs = now - startDate;
+            const diffHours = diffMs / (1000 * 60 * 60);
+            let diffDays = diffHours > 0 ? diffHours / 24 : 1;
+            const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
+            const dailyAvg = formatNumber(dailyAvgRaw);
+            const roundedDays = Math.floor(diffDays);
+            let dayLabel = (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
+            let trafficClass = "avg-warning";
+            const endDateOfCycle = new Date(y, m + 1, d);
+            const totalCycleDays = Math.round((endDateOfCycle - startDate) / (1000 * 60 * 60 * 24));
+            const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
+            const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
+            const monthlyRateElec = formatNumber((dailyAvgRaw * 30).toFixed(1));
+            avgDivHtml = `
+<div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">معدل الاستهلاك خلال ${roundedDays} يوم:</span></div>
+<div class="table-container" style="margin:0 0 0;">
+    <table>
+        <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
+        <tbody><tr>
+            <td>${roundedDays}</td>
+            <td>${dailyAvg}</td>
+            <td>${monthlyRateElec}</td>
+            <td>${formatNumber(predictedBill.toFixed(2))}</td>
+        </tr></tbody>
+    </table>
+</div>`;
+        }
+    }
+
+    let totalEnergyCost = 0.0;
+    let tableRowsHtml = '';
+    let remaining = consumption;
+    let tariffs = subscriptionType === 'supported' ? PRICES.elec.supported : PRICES.elec.unsupported;
+    let acc_cons = 0;
+    for (let i = 0; i < tariffs.length && remaining > 0; i++) {
+        const [limit, price] = tariffs[i];
+        const start = acc_cons + 1;
+        const end = limit >= 999999 ? Infinity : limit;
+        const size = end === Infinity ? Infinity : (end - acc_cons);
+        const used = Math.min(remaining, size);
+        const cost = parseFloat((used * price).toFixed(5));
+        totalEnergyCost += cost;
+        remaining -= used;
+        acc_cons += used;
+        let label = end === Infinity ? `أكثر من ${start - 1}` : `${start} - ${end}`;
+        if (used > 0) {
+            tableRowsHtml += `<tr><td>${label}</td><td>${formatNumber(used)}</td><td>${elec_fmt(price)}</td><td>${elec_fmt(cost)}</td></tr>`;
+        }
+    }
+
+    let governmentSupport = 0.0;
+    if (subscriptionType === 'supported') {
+        for (const [from, to, val] of PRICES.elec.support) {
+            if (consumption >= from && consumption <= to) { governmentSupport = val; break; }
+        }
+    }
+    const wasteFee = wasteFeeValue, tvFee = PRICES.elec.tv, meterFee = (phaseValue == 3 ? PRICES.elec.meter3 : PRICES.elec.meter1), ruralFilss = consumption / 1000;
+    const totalBillBeforeSupport = totalEnergyCost + wasteFee + tvFee + meterFee + ruralFilss;
+    const finalTotal = totalBillBeforeSupport - governmentSupport;
+    const resultTitle = subscriptionType === 'supported' ? 'اشتراك مدعوم' : 'اشتراك غير مدعوم';
+
+    const html = `
+        <div style="width:100%;text-align:center;display:block;">
+            <h2 style="color:var(--secondary-green);margin:0 auto;font-size:1.1rem;font-weight:700;width:fit-content;display:inline-block;">${resultTitle}</h2>
+        </div>
+        ${avgDivHtml}
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">الاستهلاك الحالي ${formatNumber(consumption)} كيلوواط:</span></div>
+        <div class="table-container" style="">
+            <table><thead><tr><th>الشريحة</th><th>الاستهلاك</th><th>التعرفة</th><th>الإجمالي</th></tr></thead>
+            <tbody>${tableRowsHtml}</tbody></table>
+        </div>
+        <div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">رسوم إضافية:</span></div>
+        <div class="table-container" style="margin-bottom:5px;">
+            <table><thead><tr><th>تلفزيون</th><th>نفايات</th><th>عداد</th><th>فلس الريف</th></tr></thead>
+            <tbody><tr><td>${elec_fmt(tvFee)}</td><td>${elec_fmt(wasteFee)}</td><td>${elec_fmt(meterFee)}</td><td>${elec_fmt(ruralFilss)}</td></tr></tbody></table>
+        </div>
+        <div class="result-row" style="margin-top:15px;"><span class="result-text-value"><span class="result-label">الإجمالي قبل الدعم:</span><span class="result-value">${elec_fmt(totalBillBeforeSupport)}</span></span></div>
+        <div class="result-row" style="margin-bottom:15px;"><span class="result-text-value"><span class="result-label">قيمة الدعم الحكومي:</span><span class="result-value">${elec_fmt(governmentSupport)}</span></span></div>
+        <hr>
+        <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${elec_fmt(finalTotal)}</span></div>
+    `;
+
+    showModal(html, 'فاتورة-الكهرباء');
+    return true;
+}
+
+// =============================================
+// حاسبة المياه
+// =============================================
+
+document.querySelectorAll('.w-hide-kb').forEach(input => {
+    input.addEventListener('keypress', function(e) { if (e.key === 'Enter') { this.blur(); } });
+});
+
+function water_runCalculation() {
+    if (document.activeElement) document.activeElement.blur();
+    const success = calculateWaterBill();
+    if (success) {
+        if (!consumptionMode) {
+            localStorage.setItem('water_currentReading', document.getElementById('w-current-reading').value);
+            localStorage.setItem('water_previousReading', document.getElementById('w-previous-reading').value);
+        }
+        localStorage.setItem('water_sewerService', document.querySelector('input[name="w-sewer-service"]:checked').value);
+    }
+}
+
+function getFullWaterCost(cons, isSewerService) {
+    const { tariffs, base, baseSewer, overflow } = PRICES.water;
+    let wTotal = base, sTotal = isSewerService ? baseSewer : 0.0;
+    if (cons > 6) {
+        let rem = cons - 6;
+        for (let i = 0; i < tariffs.length; i++) {
+            if (rem <= 0) break;
+            const [size, wp, sp] = tariffs[i];
+            const used = Math.min(rem, size);
+            wTotal += used * wp;
+            if (isSewerService) sTotal += used * sp;
+            rem -= used;
+        }
+        if (rem > 0) { wTotal += rem * overflow[0]; if (isSewerService) sTotal += rem * overflow[1]; }
+    }
+    return wTotal + sTotal;
+}
+
+function calculateWaterBill() {
+    const currentReadingInput  = document.getElementById('w-current-reading');
+    const previousReadingInput = document.getElementById('w-previous-reading');
+    const isSewerService       = document.getElementById('w-sewer-yes').checked;
+
+    const currentReadingValue  = currentReadingInput.value.trim();
+    const previousReadingValue = previousReadingInput.value.trim();
+
+    let consumption;
+
+    if (consumptionMode) {
+        const directVal = document.getElementById('w-direct-consumption').value.trim();
+        if (directVal === '') {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'فاتورة-المياه');
+            return false;
+        }
+        consumption = parseInt(directVal, 10);
+        if (isNaN(consumption) || consumption < 0) {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'فاتورة-المياه');
+            return false;
+        }
+    } else {
+        if (currentReadingValue === '') {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-المياه');
+            return false;
+        }
+        const currentReading  = parseInt(currentReadingValue, 10);
+        const hasPrevious     = (previousReadingValue !== '' && parseInt(previousReadingValue, 10) >= 0);
+        const previousReading = hasPrevious ? parseInt(previousReadingValue, 10) : 0;
+        if (hasPrevious && currentReading < previousReading) {
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-المياه');
+            return false;
+        }
+        consumption = currentReading - previousReading;
+    }
+    const { tariffs: waterTariffs, base, baseSewer, overflow } = PRICES.water;
+    const sliceNames = [ "7 - 12", "13 - 18", "19 - 24", "25 - 30", "31 - 42", "43 فما فوق" ];
+
+    let waterTotal = 0.0, sewerTotal = 0.0, tableRowsHtml = '';
+
+    if (consumption <= 6) {
+        waterTotal = base;
+        sewerTotal = isSewerService ? baseSewer : 0.0;
+        tableRowsHtml = `<tr><td>0 - 6</td><td>${formatNumber(consumption)}</td><td>${base.toFixed(2)}</td><td>${isSewerService ? baseSewer.toFixed(2) : '0'}</td></tr>`;
+    } else {
+        waterTotal = base;
+        sewerTotal = isSewerService ? baseSewer : 0.0;
+        tableRowsHtml = `<tr><td>0 - 6</td><td>6</td><td>${base.toFixed(2)}</td><td>${isSewerService ? baseSewer.toFixed(2) : '0'}</td></tr>`;
+
+        let remaining = consumption - 6;
+        for (let i = 0; i < waterTariffs.length; i++) {
+            if (remaining <= 0) break;
+            const [blockSize, waterPrice, sewerPrice] = waterTariffs[i];
+            const used = Math.min(remaining, blockSize);
+            waterTotal += used * waterPrice;
+            if (isSewerService) sewerTotal += used * sewerPrice;
+            remaining -= used;
+            tableRowsHtml += `<tr><td>${sliceNames[i]}</td><td>${formatNumber(used)}</td><td>${water_fmt(waterPrice)}</td><td>${isSewerService ? water_fmt(sewerPrice) : '0'}</td></tr>`;
+        }
+
+        if (remaining > 0) {
+            const [waterPrice, sewerPrice] = overflow;
+            waterTotal += remaining * waterPrice;
+            if (isSewerService) sewerTotal += remaining * sewerPrice;
+            tableRowsHtml += `<tr><td>${sliceNames[5]}</td><td>${formatNumber(remaining)}</td><td>${water_fmt(waterPrice)}</td><td>${isSewerService ? water_fmt(sewerPrice) : '0'}</td></tr>`;
+        }
+    }
+
+    const finalTotal = waterTotal + sewerTotal;
+
+
+    const html = `
+        <div style="width:100%;text-align:center;">
+            <h2 style="color:var(--secondary-green);font-size:1.1rem;font-weight:700;">${isSewerService ? 'مخدوم بالصرف الصحي' : 'غير مخدوم بالصرف'}</h2>
+        </div>
+        <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">الاستهلاك الحالي ${formatNumber(consumption)} متر:</span></div>
+        <div class="table-container">
+            <table><thead><tr><th>الشريحة</th><th>استهلاك</th><th>مياه</th><th>صرف</th></tr></thead>
+            <tbody>${tableRowsHtml}</tbody></table>
+        </div>
+        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي المياه:</span><span class="result-value">${water_fmt(waterTotal)}</span></span></div>
+        <div class="result-row"><span class="result-text-value"><span class="result-label">إجمالي الصرف:</span><span class="result-value">${water_fmt(sewerTotal)}</span></span></div>
+        <hr>
+        <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${water_fmt(finalTotal)}</span></div>
+    `;
+
+    showModal(html, 'فاتورة-المياه');
+    return true;
+}
+
+// =============================================
+// window.onload — تحميل البيانات المحفوظة
+// =============================================
+window.onload = async () => {
+    await loadPrices();
+    // استعادة التبويب النشط بعد إعادة التحميل
+    const savedTab = sessionStorage.getItem('activeTab');
+    if (savedTab) {
+        sessionStorage.removeItem('activeTab');
+        switchToTab(savedTab);
+    }
+
+    // الكهرباء
+    const savedCurrent = localStorage.getItem('calculator_currentReading');
+    if (savedCurrent) document.getElementById('e-current-reading').value = savedCurrent;
+
+    const savedPrevious = localStorage.getItem('calculator_previousReading');
+    if (savedPrevious) document.getElementById('e-previous-reading').value = savedPrevious;
+
+    const savedDay = localStorage.getItem('calculator_day') || '';
+    if (savedDay) {
+        document.getElementById('e-reading-day').value = savedDay;
+        convertToYMD(document.getElementById('e-reading-day'));
+    }
+    document.getElementById('e-waste-fee').value = localStorage.getItem('calculator_waste') || '3';
+
+    const savedPhase = localStorage.getItem('calculator_phase');
+    if (savedPhase) {
+        const phaseRadio = document.getElementById(`e-phase-${savedPhase}`);
+        if (phaseRadio) phaseRadio.checked = true;
+    }
+    const savedSub = localStorage.getItem('calculator_subscriptionType');
+    if (savedSub) {
+        const radio = document.getElementById(`e-sub-${savedSub}`);
+        if (radio) radio.checked = true;
+    }
+
+    // الماء — يُحمَّل كل حقل باستقلالية
+    const savedWaterCurrent = localStorage.getItem('water_currentReading');
+    if (savedWaterCurrent) document.getElementById('w-current-reading').value = savedWaterCurrent;
+
+    const savedWaterPrevious = localStorage.getItem('water_previousReading');
+    if (savedWaterPrevious) document.getElementById('w-previous-reading').value = savedWaterPrevious;
+
+    const savedSewer = localStorage.getItem('water_sewerService');
+    if (savedSewer) document.getElementById(savedSewer === 'yes' ? 'w-sewer-yes' : 'w-sewer-no').checked = true;
+};
+
+// =============================================
+// Service Worker
+// =============================================
+if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js');
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('SW Registered'))
+            .catch(err => console.log('SW Failed', err));
     });
-  }
+}
+
+// =============================================
+// ترحيل الدورة
+// =============================================
+function rolloverCycle() {
+    document.getElementById('rollover-modal').style.display = 'flex';
+}
+
+function doRollover() {
+    if (activeCalc === 'water') {
+        const currentReading = localStorage.getItem('water_currentReading');
+        if (!currentReading) {
+            alert('لا توجد قراءة مياه حالية محفوظة للترحيل.');
+            return;
+        }
+        localStorage.setItem('water_previousReading', currentReading);
+        localStorage.removeItem('water_currentReading');
+    } else {
+        const currentReading = localStorage.getItem('calculator_currentReading');
+        if (!currentReading) {
+            alert('لا توجد قراءة كهرباء حالية محفوظة للترحيل.');
+            return;
+        }
+        localStorage.setItem('calculator_previousReading', currentReading);
+        localStorage.removeItem('calculator_currentReading');
+
+        // تقديم تاريخ الفاتورة شهراً واحداً
+        const savedDay = localStorage.getItem('calculator_day');
+        if (savedDay) {
+            const parts = savedDay.split('-');
+            if (parts.length === 3) {
+                // new Date(y, m, d) — الشهر 0-indexed، فنمرر m كما هو (بدون -1) للحصول على الشهر التالي
+                const next = new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+                const ny = next.getFullYear();
+                const nm = String(next.getMonth() + 1).padStart(2, '0');
+                const nd = String(next.getDate()).padStart(2, '0');
+                localStorage.setItem('calculator_day', `${ny}-${nm}-${nd}`);
+            }
+        }
+    }
+
+    sessionStorage.setItem('activeTab', activeCalc);
+    location.reload();
+}
+
+// =============================================
+// وضع كمية الاستهلاك المباشر
+// =============================================
+let consumptionMode = false;
+
+function toggleConsumptionMode() {
+    consumptionMode = !consumptionMode;
+    const label = document.getElementById('consumption-mode-label');
+    label.textContent = consumptionMode ? 'وضع القراءات' : 'وضع الاستهلاك';
+
+    // الكهرباء
+    document.getElementById('e-readings-container').style.display = consumptionMode ? 'none' : 'flex';
+    document.getElementById('e-consumption-container').style.display = consumptionMode ? 'block' : 'none';
+
+    // المياه
+    document.getElementById('w-readings-container').style.display = consumptionMode ? 'none' : 'flex';
+    document.getElementById('w-consumption-container').style.display = consumptionMode ? 'block' : 'none';
+}
+
+
+const dropdownMenu = document.getElementById('dropdown-menu');
+
+function toggleDropdown() {
+    dropdownMenu.classList.toggle('open');
+}
+function closeDropdown() {
+    dropdownMenu.classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+    if (!dropdownMenu.contains(e.target) && !e.target.closest('.header-menu-btn')) {
+        closeDropdown();
+    }
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDropdown(); });
+
+// =============================================
+// تصدير / استيراد / مسح (الكهرباء)
+// =============================================
+const ALL_DATA_KEYS = [
+    'calculator_currentReading',
+    'calculator_previousReading',
+    'calculator_day',
+    'calculator_waste',
+    'calculator_phase',
+    'calculator_subscriptionType',
+    'water_currentReading',
+    'water_previousReading',
+    'water_sewerService'
+];
+
+function drawerExport() {
+    const data = {};
+    ALL_DATA_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) data[k] = v; });
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const now = new Date();
+    a.download = `bills ${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()}.json`;
+    a.click();
+    
+}
+
+function drawerImport() {
+    document.getElementById('drawer-import-input').click();
+}
+
+function drawerImportFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            const data = JSON.parse(ev.target.result);
+            ALL_DATA_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem(k, data[k]); });
+            
+            location.reload();
+        } catch {
+            alert('الملف غير صالح');
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+}
+
+function drawerClear() {
+    
+    document.getElementById('clear-modal').style.display = 'flex';
+}
+
+document.getElementById('clear-cancel').onclick = () => {
+    document.getElementById('clear-modal').style.display = 'none';
+};
+
+document.getElementById('clear-confirm').onclick = () => {
+    ALL_DATA_KEYS.forEach(k => localStorage.removeItem(k));
+    document.getElementById('clear-modal').style.display = 'none';
+    location.reload();
+};
+
+document.getElementById('rollover-cancel').onclick = () => {
+    document.getElementById('rollover-modal').style.display = 'none';
+};
+
+document.getElementById('rollover-confirm').onclick = () => {
+    document.getElementById('rollover-modal').style.display = 'none';
+    doRollover();
+};
+
 </script>
 </body>
 </html>
