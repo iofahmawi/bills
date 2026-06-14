@@ -54,10 +54,16 @@
             margin: 20px auto 0;
             position: relative;
         }
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 19px;
+        }
         .header-menu-btn {
             position: absolute;
-            left: 10px;
-            top: 17px;
+            left: 0;
             background: none;
             border: none;
             color: rgba(255,255,255,0.85);
@@ -72,8 +78,8 @@
         }
         .dropdown-menu {
             position: absolute;
-            left: 10px;
-            top: 52px;
+            left: 0;
+            top: calc(100% + 8px);
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.15);
@@ -126,7 +132,7 @@
             font-weight: 800;
             color: var(--white);
             text-align: center;
-            margin-bottom: 19px;
+            margin-bottom: 0;
         }
 
         .tab-bar {
@@ -317,30 +323,32 @@
 
     <!-- Header Card -->
     <div class="header-card">
-        <button class="header-menu-btn" onclick="toggleDropdown()">⋮</button>
-        <div class="dropdown-menu" id="dropdown-menu">
-            <button class="dropdown-item" id="consumption-mode-btn" onclick="toggleConsumptionMode(); closeDropdown()">
-                <div class="dropdown-item-icon" style="background:#fef3c7;color:#d97706;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-                <span id="consumption-mode-label">وضع الاستهلاك</span>
-            </button>
-            <button class="dropdown-item" onclick="rolloverCycle(); closeDropdown()">
-                <div class="dropdown-item-icon" style="background:#ede9fe;color:#7c3aed;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
-                ترحيل الدورة
-            </button>
-            <button class="dropdown-item" onclick="drawerImport(); closeDropdown()">
-                <div class="dropdown-item-icon blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-                استيراد البيانات
-            </button>
-            <button class="dropdown-item" onclick="drawerExport(); closeDropdown()">
-                <div class="dropdown-item-icon green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-                تصدير البيانات
-            </button>
-            <button class="dropdown-item" onclick="drawerClear(); closeDropdown()">
-                <div class="dropdown-item-icon red"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
-                مسح البيانات
-            </button>
+        <div class="header-top">
+            <button class="header-menu-btn" onclick="toggleDropdown()">⋮</button>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <button class="dropdown-item" id="consumption-mode-btn" onclick="toggleConsumptionMode(); closeDropdown()">
+                    <div class="dropdown-item-icon" style="background:#fef3c7;color:#d97706;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                    <span id="consumption-mode-label">وضع الاستهلاك</span>
+                </button>
+                <button class="dropdown-item" onclick="rolloverCycle(); closeDropdown()">
+                    <div class="dropdown-item-icon" style="background:#ede9fe;color:#7c3aed;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
+                    ترحيل الدورة
+                </button>
+                <button class="dropdown-item" onclick="drawerImport(); closeDropdown()">
+                    <div class="dropdown-item-icon blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                    استيراد البيانات
+                </button>
+                <button class="dropdown-item" onclick="drawerExport(); closeDropdown()">
+                    <div class="dropdown-item-icon green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                    تصدير البيانات
+                </button>
+                <button class="dropdown-item" onclick="drawerClear(); closeDropdown()">
+                    <div class="dropdown-item-icon red"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
+                    مسح البيانات
+                </button>
+            </div>
+            <h2 class="app-title">حاسبة الفواتير</h2>
         </div>
-        <h2 class="app-title">حاسبة الفواتير</h2>
         <div class="tab-bar">
             <button class="tab-btn active" id="tab-elec" onclick="switchToTab('elec')">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
