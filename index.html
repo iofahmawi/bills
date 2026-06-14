@@ -48,24 +48,22 @@
         .header-card {
             background: var(--primary);
             border-radius: var(--radius) var(--radius) 0 0;
-            padding: 24px 20px 24px;
+            padding: 24px 20px 9px;
             width: 92%;
             max-width: 450px;
             margin: 20px auto 0;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .header-menu-btn {
             position: absolute;
             left: 10px;
+            top: 17px;
             background: none;
             border: none;
             color: rgba(255,255,255,0.85);
             width: 30px;
             height: 30px;
-            font-size: 1.32rem;
+            font-size: 1.25rem;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -119,7 +117,7 @@
         @media (display-mode: standalone), (display-mode: fullscreen) {
             .header-card {
                 padding-top: 26px;
-                padding-bottom: 24px;
+                padding-bottom: 9px;
             }
         }
 
@@ -128,26 +126,39 @@
             font-weight: 800;
             color: var(--white);
             text-align: center;
-            margin-bottom: 0;
-            margin-top: 1px;
+            margin-bottom: 19px;
         }
 
-        .tab-icon-btn {
-            position: absolute;
-            right: 14px;
-            background: none;
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            height: 44px;
+            align-items: center;
+            padding-bottom: 3px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            height: 100%;
             border: none;
-            color: rgba(255,255,255,0.9);
-            width: 30px;
-            height: 30px;
+            border-bottom: 2.5px solid transparent;
+            background: transparent;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.55);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 2px;
-            padding: 10px;
-            box-sizing: content-box;
-            right: 4px;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .tab-btn.active {
+            color: var(--white);
+            border-bottom-color: transparent;
+            font-size: 1rem;
         }
 
         /* ===== Card ===== */
@@ -329,10 +340,17 @@
                 مسح البيانات
             </button>
         </div>
-        <button class="tab-icon-btn" id="tab-toggle" onclick="switchCalc()" title="تبديل">
-            <svg id="tab-toggle-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </button>
         <h2 class="app-title">حاسبة الفواتير</h2>
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tab-elec" onclick="switchToTab('elec')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                الكهرباء
+            </button>
+            <button class="tab-btn" id="tab-water" onclick="switchToTab('water')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 4 10 4 15a8 8 0 0 0 16 0c0-5-8-13-8-13z"/></svg>
+                المياه
+            </button>
+        </div>
     </div>
 
     <!-- ===== قسم الكهرباء ===== -->
@@ -530,15 +548,11 @@ function switchToTab(tab) {
     activeCalc = tab;
     document.getElementById('section-elec').style.display  = tab === 'elec'  ? 'block' : 'none';
     document.getElementById('section-water').style.display = tab === 'water' ? 'block' : 'none';
-    // الأيقونة تعرض القسم الآخر (للتبديل إليه)
-    const icon = document.getElementById('tab-toggle-icon');
-    if (tab === 'elec') {
-        icon.innerHTML = '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>';
-    } else {
-        icon.innerHTML = '<path d="M12 2C12 2 4 10 4 15a8 8 0 0 0 16 0c0-5-8-13-8-13z"/>';
-    }
+    document.getElementById('tab-elec').classList.toggle('active',  tab === 'elec');
+    document.getElementById('tab-water').classList.toggle('active', tab === 'water');
 }
 
+// للتوافق مع أي استدعاء قديم
 function switchCalc() { switchToTab(activeCalc === 'elec' ? 'water' : 'elec'); }
 
 // =============================================
