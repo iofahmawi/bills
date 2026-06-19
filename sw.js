@@ -1,5 +1,5 @@
 // sw.js
-const CACHE_NAME = 'e-bill-dynamic-v151';
+const CACHE_NAME = 'e-bill-dynamic-v152';
 
 const urlsToCache = [
   './',
