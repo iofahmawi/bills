@@ -32,15 +32,13 @@
             outline: none;
         }
 
-        html, body { min-height: 100%; background-color: var(--bg-light); }
+        html, body { height: 100%; background-color: var(--bg-light); }
 
         body {
             direction: rtl;
             text-align: right;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            min-height: 100dvh;
             color: var(--text-main);
         }
 
@@ -177,7 +175,7 @@
             padding: 28px;
             width: 92%;
             max-width: 450px;
-            margin: 0 auto 10px;
+            margin: 0 auto 20px;
             position: relative;
             z-index: 10;
         }
@@ -312,7 +310,7 @@
             text-align: center;
             color: var(--text-muted);
             font-size: 0.9rem;
-            padding: 6px 0 calc(15px + env(safe-area-inset-bottom, 0px));
+            padding: 20px 0 calc(15px + env(safe-area-inset-bottom, 0px));
         }
         .simple-footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
 
@@ -371,12 +369,6 @@
     <div id="section-elec">
         <div class="card">
             <div class="input-group">
-                <div id="loss-active-note" style="display:none;width:100%;box-sizing:border-box;align-items:center;justify-content:space-between;gap:8px;background:#eff6ff;border:1.5px solid #dbeafe;color:var(--primary);border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:0.82rem;font-weight:600;">
-                    <span id="loss-active-note-text" style="flex:1;"></span>
-                    <button type="button" onclick="dismissLossNote()" style="background:none;border:none;color:var(--primary);cursor:pointer;padding:2px;display:flex;align-items:center;flex-shrink:0;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                </div>
                 <div class="readings-container" id="e-readings-container">
                     <div class="reading-input">
                         <label for="e-previous-reading">القراءة السابقة</label>
@@ -1223,26 +1215,9 @@ function openLossModal() {
     document.getElementById('loss-modal').style.display = 'flex';
 }
 
-let lossNoteDismissed = false;
-
 function updateLossModeLabel() {
     const label = document.getElementById('loss-mode-label');
     label.textContent = 'إضافة استهلاك';
-
-    const v = parseFloat(localStorage.getItem('calculator_lossAmount'));
-    const note = document.getElementById('loss-active-note');
-    const noteText = document.getElementById('loss-active-note-text');
-    if (!isNaN(v) && v > 0 && !lossNoteDismissed) {
-        noteText.textContent = `تم إضافة ${formatNumber(v)} كيلوواط كاستهلاك إضافي`;
-        note.style.display = 'flex';
-    } else {
-        note.style.display = 'none';
-    }
-}
-
-function dismissLossNote() {
-    lossNoteDismissed = true;
-    document.getElementById('loss-active-note').style.display = 'none';
 }
 
 document.getElementById('loss-cancel').onclick = () => {
@@ -1261,7 +1236,6 @@ document.getElementById('loss-save').onclick = () => {
         }
         localStorage.setItem('calculator_lossAmount', val);
     }
-    lossNoteDismissed = false;
     updateLossModeLabel();
     document.getElementById('loss-modal').style.display = 'none';
 };
