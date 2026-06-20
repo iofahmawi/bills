@@ -425,6 +425,7 @@
 
             <button type="button" class="calculate-btn" onclick="elec_calculateAndSave()">احسب القيمة</button>
         </div>
+        <div id="loss-active-note" style="display:none;text-align:center;font-size:0.72rem;color:var(--text-muted);margin-top:8px;font-weight:500;"></div>
     </div>
 
     <!-- ===== قسم المياه ===== -->
@@ -1218,6 +1219,15 @@ function openLossModal() {
 function updateLossModeLabel() {
     const label = document.getElementById('loss-mode-label');
     label.textContent = 'إضافة استهلاك';
+
+    const v = parseFloat(localStorage.getItem('calculator_lossAmount'));
+    const note = document.getElementById('loss-active-note');
+    if (!isNaN(v) && v > 0) {
+        note.textContent = `تم إضافة ${formatNumber(v)} كيلوواط كاستهلاك إضافي`;
+        note.style.display = 'block';
+    } else {
+        note.style.display = 'none';
+    }
 }
 
 document.getElementById('loss-cancel').onclick = () => {
