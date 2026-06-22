@@ -607,7 +607,7 @@ function showModal(html, downloadName) {
             el.style.overflowY = prevOverflow;
             const link = document.createElement('a');
             const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-            link.download = `${downloadName}-${today}.png`;
+            link.download = `${downloadName} ${today}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
@@ -729,17 +729,17 @@ function calculateElectricBill() {
     if (consumptionMode) {
         const directVal = document.getElementById('e-direct-consumption').value.trim();
         if (directVal === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'فاتورة-الكهرباء');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'e-bill');
             return false;
         }
         consumption = parseFloat(directVal);
         if (isNaN(consumption) || consumption < 0) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'فاتورة-الكهرباء');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'e-bill');
             return false;
         }
     } else {
         if (currentReadingValue === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>', 'فاتورة-الكهرباء');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية على الأقل.</p>', 'e-bill');
             return false;
         }
         const currentReading  = parseFloat(currentReadingValue);
@@ -747,7 +747,7 @@ function calculateElectricBill() {
         const previousReading = prevExists ? parseFloat(previousReadingValue) : 0;
         consumption = currentReading - previousReading;
         if (consumption < 0) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>', 'فاتورة-الكهرباء');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية لا يمكن أن تكون أصغر من القراءة السابقة.</p>', 'e-bill');
             return false;
         }
     }
@@ -860,7 +860,7 @@ function calculateElectricBill() {
         <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${elec_fmt(finalTotal)}</span></div>
     `;
 
-    showModal(html, 'فاتورة-الكهرباء');
+    showModal(html, 'e-bill');
     return true;
 }
 
@@ -915,24 +915,24 @@ function calculateWaterBill() {
     if (consumptionMode) {
         const directVal = document.getElementById('w-direct-consumption').value.trim();
         if (directVal === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'فاتورة-المياه');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية الاستهلاك.</p>', 'w-bill');
             return false;
         }
         consumption = parseInt(directVal, 10);
         if (isNaN(consumption) || consumption < 0) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'فاتورة-المياه');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال كمية استهلاك صحيحة.</p>', 'w-bill');
             return false;
         }
     } else {
         if (currentReadingValue === '') {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'فاتورة-المياه');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">الرجاء إدخال القراءة الحالية.</p>', 'w-bill');
             return false;
         }
         const currentReading  = parseInt(currentReadingValue, 10);
         const hasPrevious     = (previousReadingValue !== '' && parseInt(previousReadingValue, 10) >= 0);
         const previousReading = hasPrevious ? parseInt(previousReadingValue, 10) : 0;
         if (hasPrevious && currentReading < previousReading) {
-            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'فاتورة-المياه');
+            showModal('<p style="color:var(--error-red);text-align:center;font-weight:bold;padding:20px;">القراءة الحالية أقل من السابقة!</p>', 'w-bill');
             return false;
         }
         consumption = currentReading - previousReading;
@@ -988,7 +988,7 @@ function calculateWaterBill() {
         <div class="final-total-section"><p>المبلغ النهائي المطلوب:</p><span>${water_fmt(finalTotal)}</span></div>
     `;
 
-    showModal(html, 'فاتورة-المياه');
+    showModal(html, 'w-bill');
     return true;
 }
 
