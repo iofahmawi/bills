@@ -779,6 +779,7 @@ function calculateElectricBill() {
 
             const dailyAvgRaw = parseFloat((consumption / diffDays).toFixed(2));
             const dailyAvg = formatNumber(dailyAvgRaw);
+            const hourlyAvg = formatNumber((dailyAvgRaw / 24).toFixed(2));
             let dayLabel = (roundedDays >= 3 && roundedDays <= 10) ? `<strong>${roundedDays}</strong> أيام` : `<strong>${roundedDays}</strong> يوم`;
             let trafficClass = "avg-warning";
             const predictedCons = Math.round(dailyAvgRaw * totalCycleDays);
@@ -788,9 +789,9 @@ function calculateElectricBill() {
 <div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">معدل الاستهلاك خلال ${roundedDays} يوم:</span></div>
 <div class="table-container" style="margin:0 0 0;">
     <table>
-        <thead><tr><th style="width:50px;">أيام</th><th>معدل يومي</th><th>معدل شهري</th><th>فاتورة متوقعة</th></tr></thead>
+        <thead><tr><th style="width:21.83%;white-space:nowrap;">ساعة</th><th style="width:21.83%;white-space:nowrap;">يوم</th><th style="width:21.83%;white-space:nowrap;">شهر</th><th style="width:34.5%;white-space:nowrap;">فاتورة متوقعة</th></tr></thead>
         <tbody><tr>
-            <td>${roundedDays}</td>
+            <td>${hourlyAvg}</td>
             <td>${dailyAvg}</td>
             <td>${monthlyRateElec}</td>
             <td>${formatNumber(predictedBill.toFixed(2))}</td>
@@ -851,7 +852,7 @@ function calculateElectricBill() {
         </div>
         <div class="result-row" style="margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">رسوم إضافية:</span></div>
         <div class="table-container" style="margin-bottom:5px;">
-            <table><thead><tr><th>تلفزيون</th><th>نفايات</th><th>عداد</th><th>فلس الريف</th></tr></thead>
+            <table><thead><tr><th style="width:24%;">تلفزيون</th><th style="width:24%;">نفايات</th><th style="width:24%;">عداد</th><th style="width:28%;white-space:nowrap;">فلس الريف</th></tr></thead>
             <tbody><tr><td>${elec_fmt(tvFee)}</td><td>${elec_fmt(wasteFee)}</td><td>${elec_fmt(meterFee)}</td><td>${elec_fmt(ruralFilss)}</td></tr></tbody></table>
         </div>
         <div class="result-row" style="margin-top:15px;"><span class="result-text-value"><span class="result-label">الإجمالي قبل الدعم:</span><span class="result-value">${elec_fmt(totalBillBeforeSupport)}</span></span></div>
