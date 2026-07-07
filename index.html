@@ -127,6 +127,10 @@
         .dropdown-item-icon.green { background: #d1fae5; color: #059669; }
         .dropdown-item-icon.red   { background: #fee2e2; color: var(--error-red); }
         .dropdown-item + .dropdown-item { border-top: 1px solid #f1f5f9; }
+        #subscriptions-submenu .dropdown-item { padding-right: 30px; font-size: 0.88rem; }
+        #subscriptions-submenu .dropdown-item-icon { width: 24px; height: 24px; }
+        #subscriptions-submenu .dropdown-item:first-child { border-top: 1px solid #f1f5f9; }
+        #subscriptions-submenu .dropdown-item + .dropdown-item { border-top: 1px solid #eef1f4; }
         #loss-amount-input::placeholder, #add-subscription-input::placeholder { color: #c3cbd6; }
 
         @media (display-mode: standalone), (display-mode: fullscreen) {
@@ -343,11 +347,12 @@
                     <div class="dropdown-item-icon" style="background:#fee2e2;color:#dc2626;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
                     <span id="loss-mode-label">إضافة استهلاك</span>
                 </button>
-                <button class="dropdown-item" id="add-subscription-btn" onclick="addSubscription(); closeDropdown()">
-                    <div class="dropdown-item-icon" style="background:#e0e7ff;color:#4338ca;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
-                    اضافة اشتراك
+                <button class="dropdown-item" id="manage-subscriptions-btn" onclick="toggleSubscriptionsSubmenu()">
+                    <div class="dropdown-item-icon" style="background:#e0e7ff;color:#4338ca;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+                    <span style="flex:1;">إدارة الاشتراكات</span>
                 </button>
-                <button class="dropdown-item" onclick="rolloverCycle(); closeDropdown()">
+                <div id="subscriptions-submenu" style="display:none;background:#f8fafc;"></div>
+                <button class="dropdown-item" onclick="rolloverCycle(); closeDropdown()" style="border-top:1px solid #f1f5f9;">
                     <div class="dropdown-item-icon" style="background:#ede9fe;color:#7c3aed;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
                     ترحيل الدورة
                 </button>
@@ -1167,6 +1172,8 @@ function toggleDropdown() {
 }
 function closeDropdown() {
     dropdownMenu.classList.remove('open');
+    const submenu = document.getElementById('subscriptions-submenu');
+    if (submenu) submenu.style.display = 'none';
 }
 
 document.addEventListener('click', e => {
@@ -1199,21 +1206,36 @@ function escapeHtml(str) {
 }
 
 function renderSubscriptions() {
-    const addBtn = document.getElementById('add-subscription-btn');
-    if (!addBtn) return;
-    // إزالة العناصر المُدرجة ديناميكيًا في المرة السابقة
-    document.querySelectorAll('.dyn-sub-item').forEach(el => el.remove());
+    const submenu = document.getElementById('subscriptions-submenu');
+    if (!submenu) return;
 
     const list = getSubscriptions();
     const activeId = getActiveSubscription();
-    const html = list.map(s => `
+    // الاشتراك الرئيسي أولاً، ثم بقية الاشتراكات
+    const ordered = [
+        ...list.filter(s => s.id === 'default'),
+        ...list.filter(s => s.id !== 'default')
+    ];
+    const itemsHtml = ordered.map(s => `
         <button class="dropdown-item dyn-sub-item" data-sub-id="${s.id}">
             <div class="dropdown-item-icon" style="background:#f1f5f9;color:#64748b;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
             <span>${escapeHtml(s.name)}${s.id === activeId ? ' <span style="font-size:0.95em;">✓</span>' : ''}</span>
         </button>
     `).join('');
-    addBtn.insertAdjacentHTML('afterend', html);
+    const addHtml = `
+        <button class="dropdown-item" id="add-subscription-btn" onclick="addSubscription(); closeDropdown()">
+            <div class="dropdown-item-icon" style="background:#e0e7ff;color:#4338ca;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            <span>اضافة اشتراك</span>
+        </button>
+    `;
+    submenu.innerHTML = itemsHtml + addHtml;
     attachSubscriptionEvents();
+}
+
+function toggleSubscriptionsSubmenu() {
+    const submenu = document.getElementById('subscriptions-submenu');
+    const isOpen = submenu.style.display === 'block';
+    submenu.style.display = isOpen ? 'none' : 'block';
 }
 
 let subLongPressTimer = null;
