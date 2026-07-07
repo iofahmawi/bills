@@ -87,6 +87,14 @@
             min-width: 155px;
             overflow: hidden;
             display: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        #loss-amount-input, #add-subscription-input, #edit-subscription-input {
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
         .dropdown-menu.open { display: block; }
         .dropdown-item {
@@ -119,6 +127,7 @@
         .dropdown-item-icon.green { background: #d1fae5; color: #059669; }
         .dropdown-item-icon.red   { background: #fee2e2; color: var(--error-red); }
         .dropdown-item + .dropdown-item { border-top: 1px solid #f1f5f9; }
+        #loss-amount-input::placeholder, #add-subscription-input::placeholder { color: #c3cbd6; }
 
         @media (display-mode: standalone), (display-mode: fullscreen) {
             .header-card {
@@ -334,6 +343,10 @@
                     <div class="dropdown-item-icon" style="background:#fee2e2;color:#dc2626;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
                     <span id="loss-mode-label">إضافة استهلاك</span>
                 </button>
+                <button class="dropdown-item" id="add-subscription-btn" onclick="addSubscription(); closeDropdown()">
+                    <div class="dropdown-item-icon" style="background:#e0e7ff;color:#4338ca;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+                    اضافة اشتراك
+                </button>
                 <button class="dropdown-item" onclick="rolloverCycle(); closeDropdown()">
                     <div class="dropdown-item-icon" style="background:#ede9fe;color:#7c3aed;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
                     ترحيل الدورة
@@ -511,7 +524,7 @@
     </div>
 </div>
 
-<div id="loss-modal" onclick="if(event.target===this){this.style.display='none';}" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+<div id="loss-modal" class="keyboard-aware-modal" onclick="if(event.target===this){this.style.display='none';}" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
     <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
         <div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -523,6 +536,36 @@
             <button id="loss-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
             <button id="loss-save" style="flex:1;height:42px;border:none;background:#dc2626;border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">حفظ</button>
         </div>
+    </div>
+</div>
+
+<div id="add-subscription-modal" class="keyboard-aware-modal" onclick="if(event.target===this){this.style.display='none';}" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+    <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
+        <div style="width:52px;height:52px;background:#e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <p style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--text-main);">اضافة اشتراك</p>
+        <p style="font-size:0.86rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">أدخل اسماً للمنزل أو الاشتراك الجديد لمتابعة فواتيره بشكل مستقل</p>
+        <input type="text" id="add-subscription-input" placeholder="مثال: منزل الوالد" style="width:100%;height:46px;border:1.5px solid #e2e8f0;border-radius:12px;text-align:center;font-size:1rem;margin-bottom:18px;padding:0 10px;box-sizing:border-box;">
+        <div style="display:flex;gap:10px;">
+            <button id="add-subscription-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+            <button id="add-subscription-save" style="flex:1;height:42px;border:none;background:#4338ca;border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">إضافة</button>
+        </div>
+    </div>
+</div>
+
+<div id="edit-subscription-modal" class="keyboard-aware-modal" onclick="if(event.target===this){this.style.display='none';}" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:3000;justify-content:center;align-items:center;padding:30px;backdrop-filter:blur(4px);">
+    <div style="background:var(--white);border-radius:20px;padding:28px 24px;width:100%;max-width:300px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2);">
+        <div style="width:52px;height:52px;background:#e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4338ca" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <p style="font-weight:700;font-size:1rem;margin-bottom:16px;color:var(--text-main);">تعديل الاشتراك</p>
+        <input type="text" id="edit-subscription-input" style="width:100%;height:46px;border:1.5px solid #e2e8f0;border-radius:12px;text-align:center;font-size:1rem;margin-bottom:18px;padding:0 10px;box-sizing:border-box;">
+        <div style="display:flex;gap:10px;">
+            <button id="edit-subscription-cancel" style="flex:1;height:42px;border:1.5px solid #e2e8f0;background:var(--white);border-radius:12px;font-size:0.94rem;font-weight:600;color:var(--text-muted);cursor:pointer;">إلغاء</button>
+            <button id="edit-subscription-save" style="flex:1;height:42px;border:none;background:#4338ca;border-radius:12px;font-size:0.94rem;font-weight:700;color:white;cursor:pointer;">حفظ</button>
+        </div>
+        <button id="edit-subscription-delete" style="width:100%;height:38px;border:none;background:none;color:var(--error-red);font-size:0.88rem;font-weight:600;cursor:pointer;margin-top:14px;">حذف الاشتراك</button>
     </div>
 </div>
 
@@ -998,6 +1041,7 @@ function calculateWaterBill() {
 // =============================================
 window.onload = async () => {
     await loadPrices();
+    renderSubscriptions();
     // استعادة التبويب النشط بعد إعادة التحميل
     const savedTab = sessionStorage.getItem('activeTab');
     if (savedTab) {
@@ -1134,6 +1178,226 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDropdown(); });
 
 // =============================================
+// الاشتراكات (منازل متعددة)
+// =============================================
+function getSubscriptions() {
+    const raw = localStorage.getItem('app_subscriptions');
+    if (raw) {
+        try { return JSON.parse(raw); } catch {}
+    }
+    const def = [{ id: 'default', name: 'المنزل الرئيسي' }];
+    localStorage.setItem('app_subscriptions', JSON.stringify(def));
+    return def;
+}
+
+function getActiveSubscription() {
+    return localStorage.getItem('app_active_subscription') || 'default';
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function renderSubscriptions() {
+    const addBtn = document.getElementById('add-subscription-btn');
+    if (!addBtn) return;
+    // إزالة العناصر المُدرجة ديناميكيًا في المرة السابقة
+    document.querySelectorAll('.dyn-sub-item').forEach(el => el.remove());
+
+    const list = getSubscriptions();
+    const activeId = getActiveSubscription();
+    const html = list.map(s => `
+        <button class="dropdown-item dyn-sub-item" data-sub-id="${s.id}">
+            <div class="dropdown-item-icon" style="background:#f1f5f9;color:#64748b;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <span>${escapeHtml(s.name)}${s.id === activeId ? ' <span style="font-size:0.95em;">✓</span>' : ''}</span>
+        </button>
+    `).join('');
+    addBtn.insertAdjacentHTML('afterend', html);
+    attachSubscriptionEvents();
+}
+
+let subLongPressTimer = null;
+let subLongPressTriggered = false;
+
+function attachSubscriptionEvents() {
+    document.querySelectorAll('.dyn-sub-item').forEach(btn => {
+        const id = btn.dataset.subId;
+
+        const start = () => {
+            subLongPressTriggered = false;
+            subLongPressTimer = setTimeout(() => {
+                subLongPressTriggered = true;
+                openEditSubscriptionModal(id);
+            }, 550);
+        };
+        const cancelTimer = () => clearTimeout(subLongPressTimer);
+
+        btn.addEventListener('pointerdown', start);
+        btn.addEventListener('pointerup', cancelTimer);
+        btn.addEventListener('pointerleave', cancelTimer);
+        btn.addEventListener('pointercancel', cancelTimer);
+
+        btn.addEventListener('click', () => {
+            if (subLongPressTriggered) {
+                subLongPressTriggered = false;
+                return;
+            }
+            switchSubscription(id);
+            closeDropdown();
+        });
+    });
+}
+
+function switchSubscription(targetId) {
+    const currentId = getActiveSubscription();
+    if (targetId === currentId) return;
+
+    // حفظ بيانات الاشتراك الحالي في مكانه الخاص
+    ALL_DATA_KEYS.forEach(k => {
+        const v = localStorage.getItem(k);
+        const slotKey = `sub_${currentId}_${k}`;
+        if (v !== null) localStorage.setItem(slotKey, v);
+        else localStorage.removeItem(slotKey);
+    });
+
+    // تحميل بيانات الاشتراك المستهدف
+    ALL_DATA_KEYS.forEach(k => {
+        const slotKey = `sub_${targetId}_${k}`;
+        const v = localStorage.getItem(slotKey);
+        if (v !== null) localStorage.setItem(k, v);
+        else localStorage.removeItem(k);
+    });
+
+    localStorage.setItem('app_active_subscription', targetId);
+    location.reload();
+}
+
+function addSubscription() {
+    document.getElementById('add-subscription-input').value = '';
+    document.getElementById('add-subscription-modal').style.display = 'flex';
+    updateModalPositions();
+    setTimeout(() => document.getElementById('add-subscription-input').focus(), 50);
+}
+
+document.getElementById('add-subscription-cancel').onclick = () => {
+    document.getElementById('add-subscription-modal').style.display = 'none';
+};
+
+document.getElementById('add-subscription-save').onclick = () => {
+    const name = document.getElementById('add-subscription-input').value.trim();
+    if (!name) {
+        alert('الرجاء إدخال اسم للاشتراك');
+        return;
+    }
+    const list = getSubscriptions();
+    const id = 'sub' + Date.now();
+    list.push({ id, name });
+    localStorage.setItem('app_subscriptions', JSON.stringify(list));
+    document.getElementById('add-subscription-modal').style.display = 'none';
+    switchSubscription(id);
+};
+
+// =============================================
+// تمركز النوافذ فوق لوحة المفاتيح
+// =============================================
+function updateModalPositions() {
+    if (!window.visualViewport) return;
+    const vv = window.visualViewport;
+    document.querySelectorAll('.keyboard-aware-modal').forEach(modal => {
+        if (modal.style.display === 'flex') {
+            modal.style.height = vv.height + 'px';
+            modal.style.top = vv.offsetTop + 'px';
+            modal.style.bottom = 'auto';
+        }
+    });
+}
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateModalPositions);
+    window.visualViewport.addEventListener('scroll', updateModalPositions);
+}
+
+['loss-amount-input', 'add-subscription-input', 'edit-subscription-input'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    ['copy', 'cut', 'contextmenu', 'selectstart'].forEach(evt => {
+        el.addEventListener(evt, e => e.preventDefault());
+    });
+});
+
+document.getElementById('add-subscription-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('add-subscription-save').click();
+});
+
+// =============================================
+// تعديل / حذف اشتراك (عبر الضغط المطول)
+// =============================================
+let editingSubscriptionId = null;
+
+function loadSlotIntoLive(id) {
+    ALL_DATA_KEYS.forEach(k => {
+        const slotKey = `sub_${id}_${k}`;
+        const v = localStorage.getItem(slotKey);
+        if (v !== null) localStorage.setItem(k, v);
+        else localStorage.removeItem(k);
+    });
+}
+
+function openEditSubscriptionModal(id) {
+    const sub = getSubscriptions().find(s => s.id === id);
+    if (!sub) return;
+    editingSubscriptionId = id;
+    document.getElementById('edit-subscription-input').value = sub.name;
+    document.getElementById('edit-subscription-delete').style.display = (id === 'default') ? 'none' : 'block';
+    document.getElementById('edit-subscription-modal').style.display = 'flex';
+    updateModalPositions();
+    setTimeout(() => document.getElementById('edit-subscription-input').focus(), 50);
+}
+
+document.getElementById('edit-subscription-cancel').onclick = () => {
+    document.getElementById('edit-subscription-modal').style.display = 'none';
+};
+
+document.getElementById('edit-subscription-save').onclick = () => {
+    const name = document.getElementById('edit-subscription-input').value.trim();
+    if (!name) {
+        alert('الرجاء إدخال اسم صحيح');
+        return;
+    }
+    const list = getSubscriptions();
+    const sub = list.find(s => s.id === editingSubscriptionId);
+    if (sub) sub.name = name;
+    localStorage.setItem('app_subscriptions', JSON.stringify(list));
+    document.getElementById('edit-subscription-modal').style.display = 'none';
+    renderSubscriptions();
+};
+
+document.getElementById('edit-subscription-delete').onclick = () => {
+    if (editingSubscriptionId === 'default') return;
+    if (!confirm('سيتم حذف هذا الاشتراك وجميع بياناته المحفوظة نهائيًا، هل أنت متأكد؟')) return;
+
+    const deletedId = editingSubscriptionId;
+    const list = getSubscriptions().filter(s => s.id !== deletedId);
+    localStorage.setItem('app_subscriptions', JSON.stringify(list));
+    ALL_DATA_KEYS.forEach(k => localStorage.removeItem(`sub_${deletedId}_${k}`));
+
+    document.getElementById('edit-subscription-modal').style.display = 'none';
+
+    if (getActiveSubscription() === deletedId) {
+        ALL_DATA_KEYS.forEach(k => localStorage.removeItem(k));
+        loadSlotIntoLive('default');
+        localStorage.setItem('app_active_subscription', 'default');
+        location.reload();
+    } else {
+        renderSubscriptions();
+    }
+};
+
+document.getElementById('edit-subscription-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('edit-subscription-save').click();
+});
+
+// =============================================
 // تصدير / استيراد / مسح (الكهرباء)
 // =============================================
 const ALL_DATA_KEYS = [
@@ -1214,6 +1478,8 @@ function openLossModal() {
     const saved = localStorage.getItem('calculator_lossAmount');
     document.getElementById('loss-amount-input').value = saved || '';
     document.getElementById('loss-modal').style.display = 'flex';
+    updateModalPositions();
+    setTimeout(() => document.getElementById('loss-amount-input').focus(), 50);
 }
 
 function updateLossModeLabel() {
