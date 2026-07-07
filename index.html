@@ -1413,10 +1413,24 @@ const ALL_DATA_KEYS = [
     'water_sewerService'
 ];
 
-function drawerExport() {
+function getSubscriptionData(id) {
+    const activeId = getActiveSubscription();
     const data = {};
-    ALL_DATA_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) data[k] = v; });
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    ALL_DATA_KEYS.forEach(k => {
+        const v = (id === activeId) ? localStorage.getItem(k) : localStorage.getItem(`sub_${id}_${k}`);
+        if (v !== null) data[k] = v;
+    });
+    return data;
+}
+
+function drawerExport() {
+    const subscriptions = getSubscriptions();
+    const activeSubscription = getActiveSubscription();
+    const data = {};
+    subscriptions.forEach(s => { data[s.id] = getSubscriptionData(s.id); });
+
+    const exportObj = { subscriptions, activeSubscription, data };
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     const now = new Date();
@@ -1435,9 +1449,27 @@ function drawerImportFile(e) {
     const reader = new FileReader();
     reader.onload = ev => {
         try {
-            const data = JSON.parse(ev.target.result);
-            ALL_DATA_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem(k, data[k]); });
-            
+            const parsed = JSON.parse(ev.target.result);
+
+            if (parsed.subscriptions && parsed.data) {
+                // نسخة تشمل كل الاشتراكات بأسمائها وقيمها
+                localStorage.setItem('app_subscriptions', JSON.stringify(parsed.subscriptions));
+                const activeId = parsed.activeSubscription || (parsed.subscriptions[0] && parsed.subscriptions[0].id) || 'default';
+                localStorage.setItem('app_active_subscription', activeId);
+
+                parsed.subscriptions.forEach(s => {
+                    const subData = parsed.data[s.id] || {};
+                    ALL_DATA_KEYS.forEach(k => {
+                        const slotKey = (s.id === activeId) ? k : `sub_${s.id}_${k}`;
+                        if (subData[k] !== undefined) localStorage.setItem(slotKey, subData[k]);
+                        else localStorage.removeItem(slotKey);
+                    });
+                });
+            } else {
+                // ملف تصدير قديم: يُستورد إلى الاشتراك النشط الحالي فقط
+                ALL_DATA_KEYS.forEach(k => { if (parsed[k] !== undefined) localStorage.setItem(k, parsed[k]); });
+            }
+
             location.reload();
         } catch {
             alert('الملف غير صالح');
