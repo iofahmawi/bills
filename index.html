@@ -834,7 +834,7 @@ function calculateElectricBill() {
             const predictedBill = getFullCost(predictedCons, subscriptionType, wasteFeeValue, phaseValue);
             const monthlyRateElec = formatNumber((dailyAvgRaw * totalCycleDays).toFixed(1));
             avgDivHtml = `
-<div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">معدل الاستهلاك خلال ${roundedDays} يوم:</span></div>
+<div class="result-row" style="margin-top:15px;margin-bottom:10px;"><span class="result-label" style="font-weight:bold;font-size:0.94rem;">معدل الاستهلاك خلال <span onclick="this.textContent = this.textContent === this.dataset.rounded ? this.dataset.exact : this.dataset.rounded;" data-rounded="${roundedDays}" data-exact="${formatNumber(diffDays.toFixed(2))}" style="cursor:pointer;">${roundedDays}</span> يوم:</span></div>
 <div class="table-container" style="margin:0 0 0;">
     <table>
         <thead><tr><th style="width:21.83%;white-space:nowrap;">ساعة</th><th style="width:21.83%;white-space:nowrap;">يوم</th><th style="width:21.83%;white-space:nowrap;">شهر</th><th style="width:34.5%;white-space:nowrap;">فاتورة متوقعة</th></tr></thead>
